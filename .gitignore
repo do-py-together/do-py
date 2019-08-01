@@ -1,2 +1,9 @@
+# Build and deploy
 build/
+dist/
 do.egg-info/
+
+# Testing
+.coverage
+coverage.xml
+htmlcov/

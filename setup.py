@@ -13,7 +13,7 @@ setuptools.setup(
     version='0.0.1',
     author='Tim Davis',
     author_email='author@example.com',
-    description='A small example package',
+    description='Standardized data structures for Python',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/timdavis3991/do-py',
