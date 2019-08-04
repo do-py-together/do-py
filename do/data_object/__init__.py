@@ -1,2 +1,5 @@
-class DataObject(object):
+from .restricted_dict import RestrictedDictMixin
+
+
+class DataObject(RestrictedDictMixin):
     pass
