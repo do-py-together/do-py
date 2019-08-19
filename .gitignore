@@ -7,3 +7,7 @@ do.egg-info/
 .coverage
 coverage.xml
 htmlcov/
+
+# Misc
+.idea/
+.DS_Store

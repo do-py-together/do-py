@@ -10,11 +10,7 @@ from do.utils.json_encoder import MyJSONEncoder
 class RestrictedDictMixin(dict):
     """
     Mixin for DataObjects that drops support for methods that allow the structure to be mutable.
-
-    TODO: Explain keyspace vs attribute space.
     """
-
-    # TODO: Pull _validate_restrictions logic into a __metaclass__ here
     def _unsupported(self, op):
         raise TypeError('%s does not support %s' % (self.__class__.__name__, op))
 
