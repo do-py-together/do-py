@@ -1,4 +1,6 @@
-from do.abc import ABCRestrictions
+import copy
+
+from do.abc import ABCRestrictions, SystemMessages, ABCRestrictionMeta, classproperty
 from do.data_object.restriction import Restriction
 from do.exceptions import RestrictionError, DataObjectError
 from .restricted_dict import RestrictedDictMixin
@@ -41,7 +43,7 @@ class DataObject(RestrictedDictMixin):
         """
         This enforces restrictions. We do not want users to instantiate this class.
         """
-        assert type(cls._restrictions) is dict, BaseSystemMessages.required_argument % ('_restrictions', cls.__name__)
+        assert type(cls._restrictions) is dict, SystemMessages.required_argument % ('_restrictions', cls.__name__)
         for k in cls._restrictions:
             if hasattr(cls, k):
                 raise AttributeError('"%s" is already defined in class namespace!' % k)

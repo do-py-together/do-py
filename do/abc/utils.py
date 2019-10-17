@@ -1,15 +1,28 @@
 """
 Utils to support base_model modules.
 :date_created: 2018-12-05
+:author: Tim Davis
 """
 
-from kilimanjaro_src.misc.my_utils import PulsemAuthors, classproperty as utils_classproperty
-from kilimanjaro_src.resource.base_model.abc_restrictions.messages import SystemMessages
+from do.abc.messages import SystemMessages
 
 
-__author__ = PulsemAuthors.Tim
+class classproperty(object):
+    """
+    This is a decorator.
+    https://stackoverflow.com/questions/3203286/how-to-create-a-read-only-class-property-in-python
+    """
 
-classproperty = utils_classproperty  # TODO: Custom classproperty to support ABCRestrictions specifically
+    def __init__(self, f):
+        """
+        f is a method in a class that should be a property. This function will be able to access the attribute from
+        class-level. Instances are not required, but the attribute value in the instance is preferred over compile-time.
+        :param f:
+        """
+        self.f = f
+
+    def __get__(self, instance, owner):
+        return self.f(instance if instance else owner)
 
 
 def compare_cls(cls_name, other):
