@@ -30,7 +30,7 @@ class ABCRestrictionMeta(type):
         :param namespace:
         :return:
         """
-        assert '__module__' in namespace, SystemMessages.required_argument % ('__module__', 'ABCRestrictionsMeta')
+        assert '__module__' in namespace, SystemMessages.REQUIRED_FOR % ('__module__', 'ABCRestrictionsMeta')
 
         def nested_new(fn_new):
             def this_new(this_cls, *args, **kwargs):
@@ -63,13 +63,9 @@ class ABCRestrictionMeta(type):
                 'Invalid class type=%s' % namespace.get(ConstABCR.state, ConstABCR.root)
             namespace[ConstABCR.state] = namespace.get(ConstABCR.state, ConstABCR.root)
 
-            # No support for other metaclasses
-            if namespace.get(ConstABCR.metaclass, mcs) is not mcs:
-                raise NotImplementedError(SystemMessages.meta_in_abc_restrictions)
-
             cls = type.__new__(mcs, cls_name, parents, namespace)
             mcs._abc_classes.add(cls)
-        elif namespace.get(ConstABCR.metaclass) is mcs:
+        elif namespace.get(ConstABCR.is_abstract):
             # Node-style classes pass on requirements from roots to children of nodes. This class cannot be initialized.
             # Extra functionality can be added by explicitly declaring __new__
             namespace[ConstABCR.state] = ConstABCR.node
@@ -98,7 +94,7 @@ class ABCRestrictionMeta(type):
             for attr in required_attrs:
                 # Check that the required attribute is defined in this class or a leaf that is a parent of this class.
                 assert any([hasattr(p, attr) for p in leaves + nodes]) or attr in namespace, \
-                    SystemMessages.required_argument % (attr, cls_name)
+                    SystemMessages.REQUIRED_FOR % (attr, cls_name)
 
             # Validate that the value given to a unique attribute is unique system-wide for that attribute.
             unique_attrs = set(sum([getattr(p, ConstABCR.unique, ()) for p in roots + nodes], ()))
@@ -123,7 +119,7 @@ class ABCRestrictionMeta(type):
             for attr in unique_attrs:
                 if attr not in mcs._unique_attrs:
                     mcs._unique_attrs[attr] = []
-                assert hasattr(cls, attr), SystemMessages.required_argument % (attr, cls_name)
+                assert hasattr(cls, attr), SystemMessages.REQUIRED_FOR % (attr, cls_name)
                 mcs._unique_attrs[attr].append(cls)
 
             # Run optional compile-time validation function

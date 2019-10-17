@@ -11,6 +11,7 @@ class ConstABCR(object):
     required = '_required_'
     unique = '_unique_'
     metaclass = '__metaclass__'
+    is_abstract = '_is_abstract_'
     new = '__new__'
     state = '_state_'
     # Class types
@@ -18,10 +19,3 @@ class ConstABCR(object):
     node = 'node'
     leaf = 'leaf'
     restrictions_allowed = [root, node]
-
-
-class ESConstants(object):
-    INTERNAL = 'internal'
-    EXTERNAL = 'external'
-    EXTERNAL_GTE = 'external_gte'
-    allowed_version_types = [INTERNAL, EXTERNAL, EXTERNAL_GTE]

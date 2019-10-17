@@ -34,7 +34,7 @@ def compare_cls(cls_name, other):
     :raises: NotImplementedError
     """
     if cls_name == other:
-        raise NotImplementedError(SystemMessages.instantiation_error)
+        raise NotImplementedError(SystemMessages.INSTANTIATION_ERROR)
 
 
 def already_declared(_cls_ref, attr_name, attrs):
@@ -42,14 +42,3 @@ def already_declared(_cls_ref, attr_name, attrs):
         for attr in attrs:
             if attr in getattr(_cls_ref, attr_name):
                 return attr
-
-
-def es_doc_id_maker(instance, params):
-    """
-    Create elasticsearch document ID
-    :param instance:
-    :param params: list of params required to make the key
-    :return:
-    :rtype: str
-    """
-    return '-'.join([str(instance[p]) for p in params])

@@ -43,7 +43,7 @@ class DataObject(RestrictedDictMixin):
         """
         This enforces restrictions. We do not want users to instantiate this class.
         """
-        assert type(cls._restrictions) is dict, SystemMessages.required_argument % ('_restrictions', cls.__name__)
+        assert type(cls._restrictions) is dict, SystemMessages.REQUIRED_FOR % ('_restrictions', cls.__name__)
         for k in cls._restrictions:
             if hasattr(cls, k):
                 raise AttributeError('"%s" is already defined in class namespace!' % k)
