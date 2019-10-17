@@ -2,6 +2,7 @@
 build/
 dist/
 do.egg-info/
+node_modules/
 
 # Testing
 .coverage
