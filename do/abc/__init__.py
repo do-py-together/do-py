@@ -153,9 +153,9 @@ class ABCRestrictions(object):
             :param cls_ref:
             :return:
             """
-            assert cls_ref not in ABCRestrictionMeta.abc_classes, SystemMessages.class_already_defined
+            assert cls_ref not in ABCRestrictionMeta.abc_classes, SystemMessages.CLASS_ALREADY_DEFINED
             assert getattr(cls_ref, ConstABCR.state, ConstABCR.root) in ConstABCR.restrictions_allowed, \
-                SystemMessages.restrictions_allowed
+                SystemMessages.RESTRICTIONS_ALLOWED
 
             # Manipulate the namespace of the declared class so that metaclass handles it properly
             namespace = dict(cls_ref.__dict__)
@@ -164,7 +164,7 @@ class ABCRestrictions(object):
 
             # Check if required attributes passed in are new
             r = already_declared(cls_ref, ConstABCR.required, required_attrs)
-            assert not r, SystemMessages.attribute_already_declared % ('Required', r,
+            assert not r, SystemMessages.ATTRIBUTE_ALREADY_DECLARED % ('Required', r,
                                                                        "%s's parents" % cls_ref.__name__)
             namespace[ConstABCR.required] = required_attrs + getattr(cls_ref, ConstABCR.required, ())
 
@@ -178,7 +178,7 @@ class ABCRestrictions(object):
                 # Validate unique attributes are new across all abc_classes
                 for abc_cls in ABCRestrictionMeta.abc_classes:
                     u = already_declared(abc_cls, ConstABCR.unique, unique)
-                    assert not u, SystemMessages.attribute_already_declared % ('Unique', u, abc_cls.__name__)
+                    assert not u, SystemMessages.ATTRIBUTE_ALREADY_DECLARED % ('Unique', u, abc_cls.__name__)
                 namespace[ConstABCR.unique] = tuple(unique) + getattr(cls_ref, ConstABCR.unique, ())
             return ABCRestrictionMeta(cls_ref.__name__, cls_ref.__bases__, namespace)
 
