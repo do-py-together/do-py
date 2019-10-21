@@ -55,36 +55,6 @@ class AbstractRestriction(tuple):
     def default(self):
         return self._default
 
-    # NOTE:
-    # Opportunity 1: ES restriction building capability can be triggered from es_ables.
-    # Opportunity 2: The encoder system can be abstracted to support multiple encoding needs (including custom).
-    # Possibility to share restrictions between python and JS.
-    # Techs similar to ES may use different encoding systems.
-    #
-    # E.g. default json package in python supports custom encoding.
-    #   json.loads(x, cls=CustomEncoder)
-    #
-    # See https://docs.python.org/2/library/json.html for more details on this example. ComplexEncoder is custom
-    # encoder.
-    #
-    # import json
-    # >>> class ComplexEncoder(json.JSONEncoder):
-    # ...     def default(self, obj):
-    # ...         if isinstance(obj, complex):
-    # ...             return [obj.real, obj.imag]
-    # ...         # Let the base class default method raise the TypeError
-    # ...         return json.JSONEncoder.default(self, obj)
-    # ...
-    # >>> json.dumps(2 + 1j, cls=ComplexEncoder)
-    # '[2.0, 1.0]'
-    # >>> ComplexEncoder().encode(2 + 1j)
-    # '[2.0, 1.0]'
-    # >>> list(ComplexEncoder().iterencode(2 + 1j))
-    # ['[', '2.0', ', ', '1.0', ']']
-    @property
-    def es_restrictions(self):
-        raise NotImplementedError('ES restrictions not defined.')
-
     def __copy__(self):
         return tuple(self)
 
@@ -118,10 +88,6 @@ class SingletonRestriction(AbstractRestriction):
         else:
             cls._cache[hashable] = super(SingletonRestriction, cls).__new__(cls, restriction_tuple)
             return cls._cache[hashable]
-
-    @property
-    def es_restrictions(self):
-        raise NotImplementedError('ES restrictions not defined.')
 
 
 class _ListTypeRestriction(SingletonRestriction):
@@ -167,17 +133,6 @@ class _ListTypeRestriction(SingletonRestriction):
             raise RestrictionError.bad_data(type(data), self._allowed)
         return data
 
-    @property
-    def es_restrictions(self):
-        _x = set()
-        for e in self.allowed:
-            if e not in [None, type(None)]:
-                for i in ESEncoder.default(e).items():
-                    _x.add(i)
-        if len(_x) == 1:
-            return dict([_x.pop()])
-        raise RestrictionError('Ambiguous ES restricitons.')
-
 
 class _ListValueRestriction(SingletonRestriction):
     """
@@ -215,10 +170,6 @@ class _ListValueRestriction(SingletonRestriction):
         if data not in self._allowed:
             raise RestrictionError.bad_data(data, self._allowed)
         return data
-
-    @property
-    def es_restrictions(self):
-        return ESEncoder.default('keyword')
 
 
 class _ListNoRestriction(SingletonRestriction):
@@ -259,10 +210,6 @@ class _ListNoRestriction(SingletonRestriction):
 
     def __call__(self, data, **kwargs):
         return data
-
-    @property
-    def es_restrictions(self):
-        return None
 
 
 class _MgdRestRestriction(AbstractRestriction):
@@ -305,11 +252,6 @@ class _MgdRestRestriction(AbstractRestriction):
 
     def __call__(self, data, **kwargs):
         return self._allowed(data)
-
-    @property
-    def es_restrictions(self):
-        # NOTE: _allowed is of ManagedRestrictions type. _restricion is of AbstractRestriction type
-        return self._allowed._restriction.es_restrictions
 
 
 class _DataObjectRestriction(SingletonRestriction):
@@ -358,17 +300,6 @@ class _DataObjectRestriction(SingletonRestriction):
     @property
     def dataobj(self):
         return self.allowed
-
-    @property
-    def es_restrictions(self):
-        if hasattr(self.dataobj, 'es_restrictions'):
-            return self.dataobj.es_restrictions
-        else:
-            return {
-                'properties': {
-                    k: v.es_restrictions for k, v in self.dataobj._restrictions.iteritems()
-                    }
-                }
 
 
 class _NullableDataObjectRestriction(_DataObjectRestriction):
@@ -566,30 +497,3 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
 
     def __eq__(self, other):
         return self._restriction == other._restriction
-
-
-class ESEncoder(object):
-    """
-    Convert restrictions into ES Document Property Map
-    Ref: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
-    """
-    # NOTE: Managing nested dictionary?
-    encoding = {
-        int: {'type': 'integer'},
-        long: {'type': 'integer'},
-        float: {'type': 'float'},
-        datetime: {'type': 'date'},
-        date: {'type': 'date'},
-        bool: {'type': 'boolean'},
-        str: {'type': 'text'},
-        unicode: {'type': 'text'},
-        'keyword': {'type': 'keyword'},
-        # list: {},
-        }
-
-    @classmethod
-    def default(cls, obj):
-        try:
-            return cls.encoding[obj]
-        except KeyError:
-            raise TypeError('%s cannot be encoded!' % obj)

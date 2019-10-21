@@ -170,3 +170,6 @@ class DataObject(RestrictedDictMixin):
                     s[k] = None
             cls._schema = s
         return cls._schema
+
+    def __dir__(self):
+        return super(DataObject, self).__dir__() + self._restrictions.keys()

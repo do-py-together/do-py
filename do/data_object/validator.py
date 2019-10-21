@@ -2,7 +2,11 @@
 
 :date_created: 2019-08-18
 """
-from do.abc import ABCRestrictions, ABCRestrictionMeta
+
+import copy
+
+from do import DataObject
+from do.abc import ABCRestrictions
 
 
 @ABCRestrictions.require('_validate')
@@ -28,7 +32,7 @@ class Validator(DataObject):
 
     :attribute _validate: a validation function to validate data for mutually dependent keys
     """
-    __metaclass__ = ABCRestrictionMeta
+    _is_abstract_ = True
 
     def __init__(self, data=None, strict=True):
         super(Validator, self).__init__(data=data, strict=strict)
