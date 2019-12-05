@@ -3,6 +3,9 @@ name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
+[scripts]
+lint = "pylint do_py"
+
 [packages]
 future = "==0.18.2"
 
@@ -19,3 +22,4 @@ pylint = "==1.9.5"
 
 [requires]
 python_version = "2.7"
+

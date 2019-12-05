@@ -28,8 +28,14 @@ Install yarn, pipenv, and then run the following command.
 pipenv install --dev
 ```
 
-### Testing
+### Testing & Code Quality
+
 ####  Run unit tests
 ```
 yarn test 
+```
+
+#### Run linter
+```bash
+pipenv run lint
 ```
