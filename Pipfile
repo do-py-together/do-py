@@ -11,6 +11,7 @@ pytest = "==3.7.0"
 pytest-cov = "==2.5.1"
 twine = "1.15.0"
 ipython = "5.8.0"
+keyring = "*"
 
 [requires]
 python_version = "2.7"

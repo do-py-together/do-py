@@ -7,9 +7,9 @@ import json
 
 import pytest
 
-from do import DataObject
-from do.exceptions import DataObjectError
 from data import A, MyTestException, data, keys, short_data
+from do_py import DataObject
+from do_py.exceptions import DataObjectError
 
 
 def our_hasattr(instance, name):

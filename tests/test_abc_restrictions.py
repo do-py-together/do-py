@@ -4,9 +4,9 @@
 
 import pytest
 
-from do.abc import ABCRestrictions, ABCRestrictionMeta
-from do.abc.constants import ConstABCR
 from data import MyTestException
+from do_py.abc import ABCRestrictionMeta, ABCRestrictions
+from do_py.abc.constants import ConstABCR
 
 
 class TestABCRestrictions(object):

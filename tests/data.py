@@ -1,6 +1,6 @@
 import pytest
 
-from do import DataObject
+from do_py import DataObject
 
 
 class A(DataObject):

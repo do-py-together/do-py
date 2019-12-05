@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from do.utils.json_encoder import MyJSONEncoder
+from do_py.utils.json_encoder import MyJSONEncoder
 
 
 class TestMyJSONEncoder(object):

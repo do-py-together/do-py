@@ -7,8 +7,8 @@ import itertools as it
 
 import pytest
 
-from do.data_object.restriction import ManagedRestrictions
-from do.data_object.validator import Validator
+from do_py.data_object.restriction import ManagedRestrictions
+from do_py.data_object.validator import Validator
 
 
 class Name(ManagedRestrictions):

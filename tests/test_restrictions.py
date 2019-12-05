@@ -8,11 +8,10 @@ from copy import deepcopy
 
 import pytest
 
-from do.exceptions import DataObjectError, RestrictionError
-from do import DataObject
-from do.data_object.restriction import ManagedRestrictions, _DataObjectRestriction, \
-    _ListTypeRestriction, _ListValueRestriction, _MgdRestRestriction, Restriction, AbstractRestriction, \
-    SingletonRestriction, _NullableDataObjectRestriction
+from do_py import DataObject
+from do_py.data_object.restriction import ManagedRestrictions, Restriction, _DataObjectRestriction, \
+    _ListTypeRestriction, _ListValueRestriction, _MgdRestRestriction, _NullableDataObjectRestriction
+from do_py.exceptions import DataObjectError, RestrictionError
 
 
 class MgdRest(ManagedRestrictions):
@@ -127,7 +126,7 @@ class TestRestriction(object):
                                                               raises=RestrictionError)),
         pytest.param({A, int, float}, marks=pytest.mark.xfail(reason='Syntax error', raises=RestrictionError)),
         pytest.param(([A], int), marks=pytest.mark.xfail(reason='Default value error', raises=RestrictionError)),
-                  ])
+        ])
     def test_restriction_error(self, restriction):
         Restriction.legacy(restriction)
 

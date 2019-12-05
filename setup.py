@@ -13,8 +13,13 @@ with open('README.md', 'r') as fh:
 
 package = json.load(open('package.json', 'r'))
 author = package['author']
-author_name = re.search(r'<(.*)>', author).groups()[0]
-author_email = re.sub('(<(?:.*)>)', '', author).strip()
+author_name = re.sub('(<(?:.*)>)', '', author).strip()
+author_email = re.search(r'<(.*)>', author).groups()[0]
+
+announcement = 'Building for version %s' % package['version']
+print('%s' % ''.join(['*'] * len(announcement)))
+print(announcement)
+print('%s\n\n' % ''.join(['*'] * len(announcement)))
 
 setuptools.setup(
     name=package['name'],
