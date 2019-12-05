@@ -3,6 +3,8 @@ Custom Abstract Base Classes to implement Restrictions. Developed for DataObject
 :date_created: 2018-12-05
 """
 
+from builtins import object
+
 from .constants import ConstABCR
 from .messages import SystemMessages
 from .utils import already_declared, classproperty, compare_cls

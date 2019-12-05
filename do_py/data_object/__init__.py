@@ -82,12 +82,12 @@ class DataObject(RestrictedDictMixin):
         _dict = dict()
         d = {} if d is None else d
         # NOTE: Unrestricted keys are never allowed.
-        for k in d.keys():
+        for k in list(d.keys()):
             if k not in _restrictions:
                 raise DataObjectError.from_unknown_key(k, cls)
 
         # NOTE: Use default in strict for missing keys in data.
-        for k, v in _restrictions.iteritems():
+        for k, v in _restrictions.items():
             if k not in d:
                 if strict:
                     raise DataObjectError.from_required_key(k, cls)
@@ -161,7 +161,7 @@ class DataObject(RestrictedDictMixin):
         """
         if not cls._schema:
             s = dict()
-            for k, v in cls._restrictions.iteritems():
+            for k, v in cls._restrictions.items():
                 if type(v) is ABCRestrictionMeta:
                     s[k] = v.schema
                 elif type(v) is tuple and type(v[0]) is ABCRestrictionMeta:
@@ -172,4 +172,4 @@ class DataObject(RestrictedDictMixin):
         return cls._schema
 
     def __dir__(self):
-        return super(DataObject, self).__dir__() + self._restrictions.keys()
+        return super(DataObject, self).__dir__() + list(self._restrictions.keys())

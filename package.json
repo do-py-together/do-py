@@ -8,8 +8,8 @@
     "license": "MIT",
     "scripts": {
         "clean": "rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info",
-        "test": "pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/",
-        "build": "yarn clean && python setup.py sdist bdist_wheel",
+        "test": "pipenv run pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/",
+        "build": "yarn clean && pipenv run python setup.py sdist bdist_wheel",
         "release-test": "yarn clean && twine upload --repository-url https://test.pypi.org/legacy/ dist/*",
         "release": "yarn clean && twine upload dist/*"
     }

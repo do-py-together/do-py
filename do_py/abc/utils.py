@@ -4,6 +4,8 @@ Utils to support base_model modules.
 :author: Tim Davis
 """
 
+from builtins import object
+
 from do_py.abc.messages import SystemMessages
 
 

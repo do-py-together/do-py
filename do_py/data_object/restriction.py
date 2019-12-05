@@ -6,7 +6,8 @@ Data Object Restrictions.
 import copy
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from six import with_metaclass
+from builtins import object
+from future.utils import with_metaclass
 
 from ..abc import ABCRestrictionMeta
 from ..exceptions import RestrictionError

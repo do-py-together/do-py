@@ -1,3 +1,7 @@
+# Python compile and backup files
+*.pyc
+*.py.bak
+
 # Build and deploy
 build/
 dist/
