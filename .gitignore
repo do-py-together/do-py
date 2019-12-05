@@ -9,6 +9,7 @@ node_modules/
 coverage.xml
 htmlcov/
 .pytest_cache
+test-reports/
 
 # Misc
 .idea/
