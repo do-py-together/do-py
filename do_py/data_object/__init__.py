@@ -1,8 +1,8 @@
 import copy
 
-from do.abc import ABCRestrictions, SystemMessages, ABCRestrictionMeta, classproperty
-from do.data_object.restriction import Restriction
-from do.exceptions import RestrictionError, DataObjectError
+from do_py.abc import ABCRestrictions, SystemMessages, ABCRestrictionMeta, classproperty
+from do_py.data_object.restriction import Restriction
+from do_py.exceptions import RestrictionError, DataObjectError
 from .restricted_dict import RestrictedDictMixin
 
 

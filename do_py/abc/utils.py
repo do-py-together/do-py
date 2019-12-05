@@ -4,7 +4,7 @@ Utils to support base_model modules.
 :author: Tim Davis
 """
 
-from do.abc.messages import SystemMessages
+from do_py.abc.messages import SystemMessages
 
 
 class classproperty(object):

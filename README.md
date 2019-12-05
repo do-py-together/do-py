@@ -1,7 +1,7 @@
 # do-py
 A data-validation and standardization library wrapping Python dictionaries.
 
-### Quick Start
+## Quick Start
 
 ```python
 from do import DataObject
@@ -17,6 +17,6 @@ class A(DataObject):
 
 ---
 
-### Development
-Install do-py in development mode: `python setup.py develop`
+## Development
+Install do-py in development mode: `python setup.py develop`  
 Test: `pipenv run pytest --cov ./do/ --cov-report html ./tests/ `

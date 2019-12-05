@@ -4,13 +4,14 @@
 
 import json
 
-from do.utils.json_encoder import MyJSONEncoder
+from do_py.utils.json_encoder import MyJSONEncoder
 
 
 class RestrictedDictMixin(dict):
     """
     Mixin for DataObjects that drops support for methods that allow the structure to be mutable.
     """
+
     def _unsupported(self, op):
         raise TypeError('%s does not support %s' % (self.__class__.__name__, op))
 

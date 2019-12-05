@@ -5,8 +5,8 @@
 
 import copy
 
-from do import DataObject
-from do.abc import ABCRestrictions
+from do_py import DataObject
+from do_py.abc import ABCRestrictions
 
 
 @ABCRestrictions.require('_validate')

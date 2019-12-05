@@ -5,12 +5,11 @@ Data Object Restrictions.
 
 import copy
 from abc import ABCMeta, abstractmethod, abstractproperty
-from datetime import date, datetime
 
 from six import with_metaclass
 
-from ..exceptions import RestrictionError
 from ..abc import ABCRestrictionMeta
+from ..exceptions import RestrictionError
 
 
 class AbstractRestriction(tuple):
