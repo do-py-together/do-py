@@ -5,8 +5,10 @@ Data Object Restrictions.
 
 import copy
 from abc import ABCMeta, abstractmethod, abstractproperty
+from datetime import date, datetime
 
 from builtins import object
+from future.moves import builtins
 from future.utils import with_metaclass
 
 from ..abc import ABCRestrictionMeta
@@ -18,7 +20,7 @@ class AbstractRestriction(tuple):
     Manage restriction syntax. Pull allowed and default values for the tuple syntax.
 
     E.g.
-    For ([int], None), allowed = [int] and default = None
+    For R.INT, allowed = [int] and default = None
 
     Syntax:
     Restrictions are typically declared as tuples. The first item in the restriction is allowed. The second item is
@@ -47,6 +49,15 @@ class AbstractRestriction(tuple):
         Execute data validation. See specific restriction for more details.
         """
 
+    def with_default(self, default):
+        """
+        w: short for `with_default`
+        Add/update the default of an existing restriction.
+        :param default: The new default for this cls.
+        :return: cls.__class__
+        """
+        return self.__class__(self._allowed, default)
+
     @property
     def allowed(self):
         return self._allowed
@@ -54,6 +65,36 @@ class AbstractRestriction(tuple):
     @property
     def default(self):
         return self._default
+
+    # NOTE:
+    # Opportunity 1: ES restriction building capability can be triggered from es_ables.
+    # Opportunity 2: The encoder system can be abstracted to support multiple encoding needs (including custom).
+    # Possibility to share restrictions between python and JS.
+    # Techs similar to ES may use different encoding systems.
+    #
+    # E.g. default json package in python supports custom encoding.
+    #   json.loads(x, cls=CustomEncoder)
+    #
+    # See https://docs.python.org/2/library/json.html for more details on this example. ComplexEncoder is custom
+    # encoder.
+    #
+    # import json
+    # >>> class ComplexEncoder(json.JSONEncoder):
+    # ...     def default(self, obj):
+    # ...         if isinstance(obj, complex):
+    # ...             return [obj.real, obj.imag]
+    # ...         # Let the base class default method raise the TypeError
+    # ...         return json.JSONEncoder.default(self, obj)
+    # ...
+    # >>> json.dumps(2 + 1j, cls=ComplexEncoder)
+    # '[2.0, 1.0]'
+    # >>> ComplexEncoder().encode(2 + 1j)
+    # '[2.0, 1.0]'
+    # >>> list(ComplexEncoder().iterencode(2 + 1j))
+    # ['[', '2.0', ', ', '1.0', ']']
+    @property
+    def es_restrictions(self):
+        raise NotImplementedError('ES restrictions not defined.')
 
     def __copy__(self):
         return tuple(self)
@@ -76,18 +117,40 @@ class SingletonRestriction(AbstractRestriction):
     _cache = {}
 
     def __new__(cls, restriction_tuple):
+        """
+        This will hash and stash this restriction to allow a singleton instance to be used throughout the entire system
+        per system instance.
+        :param restriction_tuple: (allowed, default)
+        :type restriction_tuple: tuple
+        :rtype: SingletonRestriction
+        """
         try:
-            rt1 = restriction_tuple[1] if is_immutable(restriction_tuple[1]) else frozenset(restriction_tuple[1])
+            rt1 = None
+            if is_immutable(restriction_tuple[1]):
+                rt1 = restriction_tuple[1]
+            elif type(restriction_tuple[1]) in [datetime, date]:
+                # date and datetime instances are mutable. They are not iterable, hence not hashable.
+                rt1 = restriction_tuple[1].isoformat()
+            else:
+                rt1 = frozenset(restriction_tuple[1])
+
             # cls.__name__ supports restriction inheritance, i.e. _NullableDataObjectRestriction
-            hashable = (cls.__name__, frozenset(restriction_tuple[0]), rt1)
+            if type(restriction_tuple[0]) is ABCRestrictionMeta:
+                hashable = (cls.__name__, restriction_tuple[0])
+            else:
+                hashable = (cls.__name__, frozenset(restriction_tuple[0]), rt1)
         except TypeError:
-            # DataObjects are not iterable, so frozenset throws TypeError
-            hashable = (cls.__name__, restriction_tuple[0])
+            raise RestrictionError.from_unhashable(restriction_tuple[0], restriction_tuple[1])
+
         if hashable in cls._cache:
             return cls._cache[hashable]
         else:
             cls._cache[hashable] = super(SingletonRestriction, cls).__new__(cls, restriction_tuple)
             return cls._cache[hashable]
+
+    @property
+    def es_restrictions(self):
+        raise NotImplementedError('ES restrictions not defined.')
 
 
 class _ListTypeRestriction(SingletonRestriction):
@@ -110,7 +173,7 @@ class _ListTypeRestriction(SingletonRestriction):
 
     class A(DataObject):
         _restrictions = {
-            'x': ([int, float], None)
+            'x': R.INT
             }
 
     Here, x can be numbers like 1, 1.0, -3, etc.
@@ -133,6 +196,17 @@ class _ListTypeRestriction(SingletonRestriction):
             raise RestrictionError.bad_data(type(data), self._allowed)
         return data
 
+    @property
+    def es_restrictions(self):
+        _x = set()
+        for e in self.allowed:
+            if e not in [None, type(None)]:
+                for i in ESEncoder.default(e).items():
+                    _x.add(i)
+        if len(_x) == 1:
+            return dict([_x.pop()])
+        raise RestrictionError('Ambiguous ES restricitons.')
+
 
 class _ListValueRestriction(SingletonRestriction):
     """
@@ -154,7 +228,7 @@ class _ListValueRestriction(SingletonRestriction):
 
     class A(DataObject):
         _restrictions = {
-            'x': ([1, 2, 3], None)
+            'x': R.INT
             }
 
     Here, x can be numbers like 1, 2 and 3. However, numbers like 1.0, -3, etc are not allowed. Typically, this is
@@ -171,10 +245,14 @@ class _ListValueRestriction(SingletonRestriction):
             raise RestrictionError.bad_data(data, self._allowed)
         return data
 
+    @property
+    def es_restrictions(self):
+        return ESEncoder.default('keyword')
+
 
 class _ListNoRestriction(SingletonRestriction):
     """
-    Manage restriction of syntax ([], None)
+    Manage restriction of syntax R()
 
     Syntax:
     Empty list for allowed.
@@ -192,7 +270,7 @@ class _ListNoRestriction(SingletonRestriction):
 
     class A(DataObject):
         _restrictions = {
-            'x': ([], None)
+            'x': R()
             }
 
     Here, x can be primitive data types like numbers, strings, boolean, etc.
@@ -210,6 +288,10 @@ class _ListNoRestriction(SingletonRestriction):
 
     def __call__(self, data, **kwargs):
         return data
+
+    @property
+    def es_restrictions(self):
+        return None
 
 
 class _MgdRestRestriction(AbstractRestriction):
@@ -231,7 +313,7 @@ class _MgdRestRestriction(AbstractRestriction):
     E.g.:
 
     class ManagedX(ManagedRestrictions):
-        _restriction = ([int, float], None)
+        _restriction = R.INT
 
         def manage(self):
             assert self.data % 2, 'Even numbers not allowed'
@@ -253,56 +335,13 @@ class _MgdRestRestriction(AbstractRestriction):
     def __call__(self, data, **kwargs):
         return self._allowed(data)
 
-
-class _DataObjectRestriction(SingletonRestriction):
-    """
-    Manages restriction of type DataObject.
-
-    Syntax:
-    Specified as a class refence to a DO. See example below.
-
-    allowed:
-    allowed is a class reference to a DO.
-
-    default:
-    None by default.
-
-    Validation:
-    Validation is performed by the DataObject.
-
-    E.g.:
-
-    class B(DataObject):
-        _restrictions = {
-            'x': ([int, float], None)
-            }
-
-    class A(DataObject):
-        _restrictions = {
-            'b': B
-            }
-
-    In this example, the value of key 'b' in A._restrictions will be validated by class B, which is also a DataObject.
-    Complex data requires data nesting. This typically requires nested DOs, which is supported by this restriction.
-    """
-
-    def __new__(cls, allowed, default=None, **kwargs):
-        default = allowed(strict=False)
-        return super(_DataObjectRestriction, cls).__new__(cls, (allowed, default))
-
-    def __call__(self, data, strict=True, **kwargs):
-        if type(data) is self._allowed:
-            return data
-        elif strict and not isinstance(data, dict):
-            raise RestrictionError.bad_data(data, self._allowed)
-        return self._allowed(data=data, strict=strict)
-
     @property
-    def dataobj(self):
-        return self.allowed
+    def es_restrictions(self):
+        # NOTE: _allowed is of ManagedRestrictions type. _restriction is of AbstractRestriction type
+        return self._allowed._restriction.es_restrictions
 
 
-class _NullableDataObjectRestriction(_DataObjectRestriction):
+class _NullableDataObjectRestriction(SingletonRestriction):
     """
     Manage restriction of type [DataObject, type(None)].
 
@@ -322,22 +361,84 @@ class _NullableDataObjectRestriction(_DataObjectRestriction):
 
     class B(DataObject):
         _restrictions = {
-            'x': ([int, float], None)
+            'x': R.INT
             }
 
     class A(DataObject):
         _restrictions = {
-            'b': [B, type(None)]
+            'b': B
             }
 
     In this example, the value of key 'b' in A._restrictions will be validated by class B, which is also a DataObject.
     A value of None is also allowed for 'b'.
     """
 
-    def __call__(self, data, **kwargs):
+    def __new__(cls, allowed, default=None, **kwargs):
+        return super(_NullableDataObjectRestriction, cls).__new__(cls, (allowed, default))
+
+    def __call__(self, data, strict=True, **kwargs):
         if data is None:
             return data
-        return super(_NullableDataObjectRestriction, self).__call__(data, **kwargs)
+        elif strict and not isinstance(data, dict):
+            raise RestrictionError.bad_data(data, self._allowed)
+        return self._allowed(data=data, strict=strict)
+
+    @property
+    def dataobj(self):
+        return self.allowed
+
+    @property
+    def es_restrictions(self):
+        if hasattr(self.dataobj, 'es_restrictions'):
+            return self.dataobj.es_restrictions
+        else:
+            return {
+                'properties': {
+                    k: v.es_restrictions for k, v in self.dataobj._restrictions.iteritems()
+                    }
+                }
+
+
+class _DataObjectRestriction(_NullableDataObjectRestriction):
+    """
+    Manages restriction of type DataObject.
+
+    Syntax:
+    Specified as a class refence to a DO. See example below.
+
+    allowed:
+    allowed is a class reference to a DO.
+
+    default:
+    None by default.
+
+    Validation:
+    Validation is performed by the DataObject.
+
+    E.g.:
+
+    class B(DataObject):
+        _restrictions = {
+            'x': R.INT
+            }
+
+    class A(DataObject):
+        _restrictions = {
+            'b': B
+            }
+
+    In this example, the value of key 'b' in A._restrictions will be validated by class B, which is also a DataObject.
+    Complex data requires data nesting. This typically requires nested DOs, which is supported by this restriction.
+    """
+
+    def __new__(cls, allowed, default=None, **kwargs):
+        default = allowed(strict=False)
+        return super(_DataObjectRestriction, cls).__new__(cls, allowed, default=default)
+
+    def __call__(self, data, strict=True, **kwargs):
+        if type(data) is self._allowed:
+            return data
+        return self._allowed(data=data, strict=strict)
 
 
 class Restriction(object):
@@ -354,7 +455,7 @@ class Restriction(object):
         if type(default) is type:
             raise RestrictionError.from_invalid_default_value(default)
         if isinstance(allowed, ManagedRestrictions):
-            return _MgdRestRestriction(allowed, default=default, **kwargs)
+            return _MgdRestRestriction(allowed, default=allowed.default, **kwargs)
         elif type(allowed) is list:
             if len(allowed) == 0:
                 return _ListNoRestriction(allowed, default=default, **kwargs)
@@ -393,7 +494,7 @@ class Restriction(object):
         2019-06-06:
         As of this day, the plan is to expose the restrictions classes using simplied syntax. Example,
 
-            R([int, float], default=1)
+            R(int, default=1)
 
         Also, there is a plan to collect the most common restrictions into a STL (standard template library). Example,
 
@@ -405,17 +506,25 @@ class Restriction(object):
 
             class A(DataObject):
                 _restrictions = {
-                    'x': R_int
+                    'x': R.INT
                     }
 
         :param declaration: Legacy tuple syntax
         :type declaration: tuple or list or ManagedRestrictions or ABCRestrictionMeta
         """
+        # Python 3 format
         if isinstance(declaration, AbstractRestriction):
             # NOTE: This is already a restriction instance, so nothing to do here.
             return declaration
-        if type(declaration) is tuple:
-            return cls(declaration[0], default=declaration[1])
+        elif isinstance(declaration, ABCRestrictionMeta) or isinstance(declaration, ManagedRestrictions):
+            return cls(declaration)
+        elif type(declaration) is list:
+            if any([isinstance(r, type) for r in declaration]):
+                raise RestrictionError.from_unsupported(declaration)
+            return cls(declaration)
+        elif type(declaration) is tuple:
+            # Legacy format
+            raise RestrictionError.from_unsupported(declaration)
         else:
             return cls(declaration)
 
@@ -435,7 +544,7 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
     Name class ensures that key 'name' is always in title case.
 
     class Name(ManagedRestrictions):
-        _restriction = ([str, unicode], None)
+        _restriction = R.STR
 
         def manage(self):
             # validation
@@ -452,8 +561,9 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
     """
     data = None
 
-    def __init__(self):
-        self._restriction = Restriction.legacy(self._restriction)
+    def __new__(cls, *args, **kwargs):
+        cls._restriction = Restriction.legacy(cls._restriction)
+        return super(ManagedRestrictions, cls).__new__(cls, *args, **kwargs)
 
     @abstractproperty
     def _restriction(self):
@@ -497,3 +607,114 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
 
     def __eq__(self, other):
         return self._restriction == other._restriction
+
+
+class ManagedList(ManagedRestrictions):
+    _restriction = Restriction([list, type(None)])
+
+    def __init__(self, obj_cls, nullable=False):
+        super(ManagedList, self).__init__()
+        self.obj_cls = obj_cls
+        self.nullable = nullable
+
+    def manage(self):
+        if self.data is not None:
+            items = []
+            for item in self.data:
+                items.append(item if type(item) == self.obj_cls else self.obj_cls(item))
+            self.data = items
+        else:
+            if not self.nullable:
+                raise RestrictionError.bad_data(self.data, self._restriction.allowed)
+
+
+class OrderedManagedList(ManagedList):
+
+    def __init__(self, obj_cls, nullable=False, key=None, reverse=False):
+        """
+        :param obj_cls: DataObject class reference to wrap each object in list.
+        :type nullable: bool
+        :type key: function
+        :type reverse: bool
+        """
+        self.key = key
+        self.reverse = reverse
+        super(OrderedManagedList, self).__init__(obj_cls, nullable=nullable)
+
+    def manage(self):
+        """
+        Sort the data list after ManagedList does its work.
+        """
+        super(OrderedManagedList, self).manage()
+        self.data = sorted(self.data, key=self.key, reverse=self.reverse)
+
+
+# NOTE: ESR should be refactored to resource.common. OOS now due to circular imports with ESEncoder
+class ESR(object):
+    """
+    Constants class housing the different types of ES restrictions.
+    """
+    INT = {'type': 'integer'}
+    FLOAT = {'type': 'float'}
+    DATE = {'type': 'date'}
+    BOOL = {'type': 'boolean'}
+    STR = {'type': 'text'}
+    KEYWORD = {'type': 'keyword'}
+
+    @staticmethod
+    def OBJECT(nested_data_object):
+        """
+        Object-type ElasticSearch restrictions. This restriction defines a nested object on ES mapping.
+        :type nested_data_object: DataObject
+        :rtype: dict
+        """
+        if not hasattr(nested_data_object, 'es_restrictions'):
+            raise RestrictionError.bad_data(nested_data_object, 'DataObject')
+        return {
+            'type': 'object',
+            'properties': nested_data_object.es_restrictions
+            }
+
+    @staticmethod
+    def NESTED(nested_data_object):
+        """
+        Nested-type ElasticSearh restriction. This restriction defines a list of nested objects on ES mapping.
+        :type nested_data_object: DataObject
+        :rtype: dict
+        """
+        if not hasattr(nested_data_object, 'es_restrictions'):
+            raise RestrictionError.bad_data(nested_data_object, 'DataObject')
+        return {
+            'type': 'nested',
+            'properties': nested_data_object.es_restrictions
+            }
+
+
+class ESEncoder(object):
+    """
+    Convert restrictions into ES Document Property Map
+    Ref: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+    """
+    # NOTE: Managing nested dictionary?
+    encoding = {
+        int: ESR.INT,
+        long: ESR.INT,
+        builtins.int: ESR.INT,
+        float: ESR.FLOAT,
+        builtins.float: ESR.FLOAT,
+        datetime: ESR.DATE,
+        date: ESR.DATE,
+        bool: ESR.BOOL,
+        str: ESR.STR,
+        builtins.str: ESR.STR,
+        unicode: ESR.STR,
+        'keyword': ESR.KEYWORD,
+        # list: {},
+        }
+
+    @classmethod
+    def default(cls, obj):
+        try:
+            return cls.encoding[obj]
+        except KeyError:
+            raise RestrictionError('%s cannot be encoded!' % obj)

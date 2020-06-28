@@ -1,13 +1,14 @@
 import pytest
 
 from do_py import DataObject
+from do_py.data_object.common import R
 
 
 class A(DataObject):
     _restrictions = {
-        'id': ([int], None),
-        'name': ([str, unicode], None),
-        'status': ([0, 1, 2], None)
+        'id': R.INT,
+        'name': R.STR,
+        'status': R(0, 1, 2)
         }
 
     @classmethod
