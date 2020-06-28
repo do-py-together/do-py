@@ -328,22 +328,3 @@ class MgdDatetime(ManagedRestrictions):
         :rtype: MgdDate
         """
         return cls(dt_obj=date, nullable=True)
-
-
-class ManagedFloat(ManagedRestrictions):
-    """
-    Force float.
-    """
-    _restriction = R.FLOAT
-
-    def __init__(self, nullable=False):
-        self.nullable = nullable
-        super(ManagedFloat, self).__init__()
-
-    def manage(self):
-        """
-        Cast all numbers to float.
-        """
-        assert self.data is not None or self.nullable, 'Invalid type NoneType for ManagedFloat.'
-        if self.data is not None:
-            self.data = float(self.data)

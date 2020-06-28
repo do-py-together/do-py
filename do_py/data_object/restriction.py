@@ -649,7 +649,7 @@ class OrderedManagedList(ManagedList):
         self.data = sorted(self.data, key=self.key, reverse=self.reverse)
 
 
-# NOTE: ESR should be refactored to resource.common. OOS now due to circular imports with ESEncoder
+# NOTE: ESR should be refactored to common.py, but OOS for now due to circular imports with ESEncoder
 class ESR(object):
     """
     Constants class housing the different types of ES restrictions.

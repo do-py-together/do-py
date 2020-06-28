@@ -179,36 +179,3 @@ class TestRestriction(object):
 
         for k in Singletons._restrictions:
             assert id(Singletons._restrictions[k]) == id(SampleC._restrictions[k])
-
-
-# class TestManagedFloat(ManagedRestrictionTest):
-#     class_ref = ManagedFloat
-#     pos_mgd_restr_data = [
-#         pytest.param(1.0, 1.0),
-#         pytest.param('1.0', 1.0),
-#         pytest.param(1, 1.0),
-#         pytest.param(0, 0.0),
-#         ]
-#     neg_mgd_restr_data = [
-#         pytest.param(None, None, marks=pytest.mark.xfail),
-#         pytest.param('not a float', None, marks=pytest.mark.xfail),
-#         pytest.param(True, None, marks=pytest.mark.xfail),
-#         ]
-#
-#
-# class TestNullableManagedFloat(ManagedRestrictionTest):
-#     class_ref = ManagedFloat
-#     init_kwargs = {
-#         'nullable': True
-#         }
-#     pos_mgd_restr_data = [
-#         pytest.param(None, None),
-#         pytest.param(1.0, 1.0),
-#         pytest.param('1.0', 1.0),
-#         pytest.param(1, 1.0),
-#         pytest.param(0, 0.0)
-#         ]
-#     neg_mgd_restr_data = [
-#         pytest.param('not a float', None, marks=pytest.mark.xfail),
-#         pytest.param(True, None, marks=pytest.mark.xfail),
-#         ]
