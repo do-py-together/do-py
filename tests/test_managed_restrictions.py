@@ -7,6 +7,7 @@ import itertools as it
 
 import pytest
 
+from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
 from do_py.data_object.validator import Validator
 
@@ -15,7 +16,7 @@ class Name(ManagedRestrictions):
     """
     Manages name. Standardizes data to title case.
     """
-    _restriction = ([str, unicode], None)
+    _restriction = R.STR
 
     def manage(self):
         self.data = self.data.title()
@@ -25,7 +26,7 @@ class Age(ManagedRestrictions):
     """
     Manages age. Validates and standardizes data.
     """
-    _restriction = ([int], None)
+    _restriction = R.INT
 
     def manage(self):
         self.data = round(float(self.data), 1)
@@ -42,8 +43,8 @@ class A(Validator):
     _restrictions = {
         'name': Name(),
         'age': Age(),
-        'city': ([e for e in it.chain.from_iterable(city_state.itervalues())], None),
-        'state': (city_state.keys(), None)
+        'city': R(*[e for e in it.chain.from_iterable(city_state.itervalues())]),
+        'state': R(*city_state.keys())
         }
 
     def _validate(self):

@@ -9,10 +9,17 @@ import pytest
 
 from data import A, MyTestException, data, keys, short_data
 from do_py import DataObject
-from do_py.exceptions import DataObjectError
+from do_py.common import R
+from do_py.exceptions import DataObjectError, RestrictionError
 
 
 def our_hasattr(instance, name):
+    """
+
+    :param instance:
+    :param name:
+    :return:
+    """
     return name in instance.__dict__
 
 
@@ -33,8 +40,10 @@ class TestDataObject(object):
     def test_class_namespace(self):
         try:
             class B(DataObject):
+                _restrictions = {
+                    'x': R.INT.with_default(1)
+                    }
                 x = None
-                _restrictions = {'x': ([int], 1)}
 
             B(data={'x': 1})
             raise Exception('Failed to protect namespace clash between _restrictions and cls.x!')
@@ -43,42 +52,56 @@ class TestDataObject(object):
         except Exception as e:
             assert False, str(e)
 
-    @pytest.mark.parametrize('malform', [
-        pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='malform'),
-        pytest.param(False, id='!malform')
-        ])
-    @pytest.mark.parametrize('mixed', [
-        pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='mixed'),
-        pytest.param(False, id='!mixed')
-        ])
     @pytest.mark.parametrize('deep', [
         pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='deep'),
         pytest.param(False, id='!deep')
         ])
-    @pytest.mark.parametrize('inv_default', [
-        pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='inv_default'),
-        pytest.param(False, id='!inv_default')
-        ])
-    def test_restrictions_compiletime(self, malform, mixed, deep, inv_default):
+    def test_deep_restriction(self, deep):
         restric = {
             'id': [0, 1, 2],
-            'x': ([int], 1),
+            'x': R.INT.with_default(1),
             'y': []
             }
-        if malform:
-            restric['malform'] = None
-        if mixed:
-            restric['mixed'] = ([int, 1, 2], None)
         if deep:
             restric['deep'] = {
                 'this': [],
-                'fails': ([1, 2, 3], 1)
+                'fails': R(1, 2, 3, default=1)
                 }
-        if inv_default:
-            restric['inv_default'] = ([], int)
 
         class B(DataObject):
             _restrictions = restric
+
+    @pytest.mark.xfail(raises=DataObjectError)
+    def test_malformed_restrictions(self):
+        class FailsMalformed(DataObject):
+            _restrictions = {
+                'malformed': None
+                }
+
+    @pytest.mark.xfail(raises=RestrictionError)
+    def test_mixed_restrictions(self):
+        class FailsMixed(DataObject):
+            _restrictions = {
+                'mixed': R(int, 1, 2)
+                }
+
+    @pytest.mark.parametrize('restriction', [
+        [bool],
+        ([bool], None)
+        ])
+    @pytest.mark.xfail(raises=DataObjectError)
+    def test_legacy_restrictions(self, restriction):
+        class FailsLegacy(DataObject):
+            _restrictions = {
+                'legacy': restriction
+                }
+
+    @pytest.mark.xfail(raises=RestrictionError)
+    def test_int_default(self):
+        class FailsIntDefault(DataObject):
+            _restrictions = {
+                'int_default': R(default=int)
+                }
 
     @pytest.mark.parametrize('d, strict, key', [
         pytest.param(True, True, 'extra', marks=pytest.mark.xfail(raises=DataObjectError), id='d-strict-extra'),
@@ -92,9 +115,9 @@ class TestDataObject(object):
         ])
     def test_restrictions_runtime(self, d, strict, key):
         restric = {
-            'id': [0, 1, 2],
-            'x': ([int], 1),
-            'y': []
+            'id': R(0, 1, 2),
+            'x': R.INT.with_default(1),
+            'y': R()
             }
 
         class B(DataObject):
@@ -117,8 +140,8 @@ class TestDataObject(object):
     def test_nested_restrictions(self):
         class B(DataObject):
             _restrictions = {
-                'x': [1, 2],
-                'y': ([int], 100)
+                'x': R(1, 2),
+                'y': R.INT.with_default(100),
                 }
 
         class C(DataObject):
@@ -172,13 +195,7 @@ class TestDataObject(object):
             assert v is None, [(k, v) for k, v in c_default.a.iteritems()]
 
     @pytest.mark.parametrize('restrictions', [
-        pytest.param(([A, type(None)], None), id='([A, type(None)], None)'),
-        # NOTE: This is now supported. 5/22/19
-        # marks=pytest.mark.xfail(reason='Restriction list not supported for nested DataObject')),
-        pytest.param(([A, A], None),
-                     id='([A, A], None)',
-                     marks=pytest.mark.xfail(reason='Restriction list not supported for nested DataObject')),
-        pytest.param((A, None), id='(A, None)'),
+        pytest.param(R(A, type(None)), id='([A, type(None)], None)'),
         A])
     def test_supported_nested_restrictions_format(self, restrictions):
         class B(DataObject):
@@ -339,15 +356,15 @@ class TestDataObject(object):
         except TypeError:
             assert True
 
-    @pytest.mark.parametrize('complex', [pytest.mark.xfail(True), False])
+    @pytest.mark.parametrize('complex', [pytest.param(True, marks=pytest.mark.xfail), False])
     def test_str_repr(self, complex):
         from datetime import date, datetime
 
         class B(DataObject):
             _restrictions = {
-                'datetime': ([datetime], None),
-                'date': ([date], None),
-                'default': ([], None)
+                'datetime': R.DATETIME,
+                'date': R.DATE,
+                'default': R()
                 }
 
         class MyObj(dict):
@@ -409,16 +426,16 @@ class TestDataObject(object):
 
     def test_multiple_dataobjs_not_allowed(self):
         class First(DataObject):
-            _restrictions = {'id': ([int], None)}
+            _restrictions = {'id': R.INT}
 
         class Second(DataObject):
-            _restrictions = {'id': ([int], None)}
+            _restrictions = {'id': R.INT}
 
         try:
             type('Mixed',
                  (DataObject,),
                  {
-                     '_restrictions': {'id': ([First, Second], None)},
+                     '_restrictions': {'id': [First, Second]},
                      '__module__': 'pytest'
                      }
                  )
