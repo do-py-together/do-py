@@ -9,7 +9,7 @@ import pytest
 
 from data import A, MyTestException, data, keys, short_data
 from do_py import DataObject
-from do_py.data_object.common import R
+from do_py.common import R
 from do_py.exceptions import DataObjectError, RestrictionError
 
 

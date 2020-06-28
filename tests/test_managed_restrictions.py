@@ -7,7 +7,7 @@ import itertools as it
 
 import pytest
 
-from do_py.data_object.common import R
+from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
 from do_py.data_object.validator import Validator
 

@@ -1,7 +1,7 @@
 import pytest
 
 from do_py import DataObject
-from do_py.data_object.common import R
+from do_py.common import R
 
 
 class A(DataObject):
