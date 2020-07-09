@@ -32,6 +32,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/do-py-together/do-py',
     packages=setuptools.find_packages(),
+    # https://pypi.org/classifiers/
     classifiers=[
         'Development Status :: 3 - Alpha',
 
@@ -41,6 +42,7 @@ setuptools.setup(
 
         'License :: OSI Approved :: MIT License',
 
+        'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         ],
