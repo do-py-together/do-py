@@ -5,15 +5,15 @@ Tests for restrictions.
 """
 
 from copy import deepcopy
-from datetime import date, datetime
 
 import pytest
+from datetime import date, datetime
 
 from do_py import DataObject
 from do_py.common import R
 from do_py.data_object.restriction import AbstractRestriction, ManagedRestrictions, SingletonRestriction, \
-    _DataObjectRestriction, \
-    _ListTypeRestriction, _ListValueRestriction, _MgdRestRestriction, _NullableDataObjectRestriction
+    _DataObjectRestriction, _ListTypeRestriction, _ListValueRestriction, _MgdRestRestriction, \
+    _NullableDataObjectRestriction
 from do_py.exceptions import DataObjectError, RestrictionError
 
 
@@ -146,7 +146,8 @@ class TestRestriction(object):
         pytest.param([int, 1], None, marks=pytest.mark.xfail(reason='Mixed types', raises=RestrictionError)),
         pytest.param([SampleA, int, float], None, marks=pytest.mark.xfail(reason='DOs mixed with other types',
                                                                           raises=RestrictionError)),
-        pytest.param({SampleA, int, float}, None, marks=pytest.mark.xfail(reason='Syntax error', raises=RestrictionError)),
+        pytest.param({SampleA, int, float}, None,
+                     marks=pytest.mark.xfail(reason='Syntax error', raises=RestrictionError)),
         pytest.param([SampleA], int, marks=pytest.mark.xfail(reason='Default value error', raises=RestrictionError)),
         ])
     def test_restriction_error(self, allowed, default):

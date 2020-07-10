@@ -7,11 +7,13 @@ from builtins import object
 
 from .constants import ConstABCR
 from .messages import SystemMessages
-from .utils import already_declared, classproperty, compare_cls
+from .utils import already_declared, compare_cls
+from ..utils import classproperty
 
 
 class ABCRestrictionMeta(type):
     """
+    TODO
     """
     _abc_classes = set()
     _unique_attrs = dict()
@@ -141,7 +143,7 @@ class ABCRestrictions(object):
         """
         Decorator to attach requirements on the attribute namespace and declare the class as an abstract class.
         :param required_attrs:
-        :param unique: subset of required_attrs that are required to have unique values system-wide
+        :keyword unique: subset of required_attrs that are required to have unique values system-wide
         :return: decorated class
         :raises: NotImplementedError if __new__ or __metaclass__ already defined.
         :raises: AssertionError if class reference already registered. (namespace clash)

@@ -1,13 +1,14 @@
 {
     "name": "do-py",
     "description": "Standardized data structures for Python.",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "main": "index.js",
     "repository": "git@github.com:do-py-together/do-py.git",
     "author": "Tim Davis <timdavis.3991@gmail.com>",
     "license": "MIT",
     "scripts": {
         "clean": "rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info",
+        "lint": "find ./do_py -type f -name \"*.py\" | xargs pylint",
         "test": "pipenv run pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/",
         "build": "yarn clean && pipenv run python setup.py sdist bdist_wheel",
         "release-test": "yarn clean && twine upload --repository-url https://test.pypi.org/legacy/ dist/*",
