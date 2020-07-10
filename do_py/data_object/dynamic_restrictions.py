@@ -1,6 +1,7 @@
 """
 Dynamic restrictions for a DataObject.
-:date_created: 2019-08-01
+:date_created: 2020-07-10
+:author: Gian Brazzini
 """
 from do_py import DataObject, R
 from do_py.abc import ABCRestrictionMeta
