@@ -12,6 +12,6 @@
         "test": "pipenv run pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/",
         "build": "yarn clean && pipenv run python setup.py sdist bdist_wheel",
         "release-test": "yarn clean && twine upload --repository-url https://test.pypi.org/legacy/ dist/*",
-        "release": "yarn clean && twine upload dist/*"
+        "release": "yarn clean && yarn build && twine upload dist/* && yarn clean"
     }
 }

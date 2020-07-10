@@ -5,7 +5,7 @@
 # Build and deploy
 build/
 dist/
-do.egg-info/
+do_py.egg-info
 node_modules/
 
 # Testing
