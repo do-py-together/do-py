@@ -38,10 +38,6 @@ class Breakfast(dynamic_item):
         'item_metadata': R(),
         }
 
-    def _validate(self):
-        print 'validate'
-        print self.item_metadata
-
 
 class TestDynamicDataObject(object):
     """
