@@ -1,6 +1,6 @@
 """
 Property decorators useful for organizing code in a DO.
-:date_created: 2017-10-01
+:date_created: 2020-07-10
 """
 
 import inspect

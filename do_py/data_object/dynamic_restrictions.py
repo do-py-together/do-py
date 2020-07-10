@@ -1,9 +1,27 @@
 """
 Dynamic restrictions for a DataObject.
+:date_created: 2019-08-01
 """
 from do_py import DataObject, R
 from do_py.abc import ABCRestrictionMeta
+from do_py.data_object.restriction import ManagedRestrictions, _ListValueRestriction
 from do_py.utils.properties import cached_property
+
+
+class DynamicRestrictions(ManagedRestrictions):
+    """
+    A dict that contains the dynamic restrictions where the key is the independent
+    key's value and the value is the dependent key's restriction.
+    """
+    _restriction = R()
+
+    def manage(self):
+        """
+        Validate that the list is not empty and that the format is correct.
+        """
+        assert self.data, 'Missing dynamic restrictions, dict cannot be empty.'
+        for value in self.data.values():
+            assert DataObject in value.mro(), 'Dynamic restrictions depend each value being a DataObject.'
 
 
 class DynamicClassGenerator(DataObject):
@@ -11,11 +29,12 @@ class DynamicClassGenerator(DataObject):
     Generate a class that is inheritable by a DO that requires dynamic restrictions.
     :restriction independent_key: The key that the dynamic restriction depends on.
     :restriction dependent_key: The key where the restriction is dynamic.
+    :restriction dynamic_restrictions: See `DynamicRestrictions` ManagedList.
     """
     _restrictions = {
         'independent_key': R.STR,
         'dependent_key': R.STR,
-        'dynamic_restrictions': R()
+        'dynamic_restrictions': DynamicRestrictions()
         }
 
     @property
@@ -43,6 +62,8 @@ class DynamicClassGenerator(DataObject):
             instance_self._restrictions[self.dependent_key] = restriction
             # Validate the data with the new restriction.
             instance_self._restrictions[self.dependent_key](instance_self[self.dependent_key])
+            # Set the dynamic in the instance so that we can verify the data.
+            super(self.dynamic_class, instance_self).__setitem__(self.dependent_key, instance_self[self.dependent_key])
 
         attributes = {
             '_is_abstract_': True,
@@ -51,13 +72,7 @@ class DynamicClassGenerator(DataObject):
             }
 
         # Create the class using ABCRestrictionMeta as the metaclass and inheriting from DataObject.
-        instance = ABCRestrictionMeta('dynamic_%s_mixin' % self.dependent_key, (DataObject,), attributes)
-
-        # Methods that require the use of super must be attached after instantiation.
-        instance.__init__ = self.init_method
-        instance.__setitem__ = self.setitem_method
-        instance.__compile__ = self.compile_classmethod
-        return self.dynamic_class
+        return ABCRestrictionMeta('dynamic_%s_mixin' % self.dependent_key, (DataObject,), attributes)
 
     @cached_property
     def init_method(self):
@@ -92,32 +107,60 @@ class DynamicClassGenerator(DataObject):
     def compile_classmethod(self):
         """
         Generate the classmethod that will be used for compilation.
-        1) We need to validate that the independent and dependent keys must exist in the restrictions.
+        The following validations are made:
+        1) The independent and dependent keys must exist in the restrictions.
+        2) The independent restriction is a list value restriction.
+        3) All values for the independent restrictions are accounted for in the dynamic restrictions.
         :rtype: classmethod
         """
 
         def __compile__(cls):
             super(self.dynamic_class, cls).__compile__()
+
+            # Validate that the independent and dependent keys must exist in the restrictions.
             assert self.independent_key in cls._restrictions, \
                 '%s.%s required in restrictions for dynamic restrictions.' % (cls.__name__, self.independent_key)
             assert self.dependent_key in cls._restrictions, \
                 '%s.%s required in restrictions for dynamic restrictions.' % (cls.__name__, self.dependent_key)
 
+            # Validate that the independent restriction is a list value restriction.
+            independent_key_restriction = cls._restrictions[self.independent_key]
+            assert isinstance(independent_key_restriction, _ListValueRestriction), \
+                'The independent key must be of type `_ListValueRestriction`.'
+
+            # Validate that all values for the independent restrictions are accounted for in the dynamic restrictions.
+            assert len(independent_key_restriction[0]) == len(self.dynamic_restrictions), \
+                'All restrictions must be accounted for when creating dynamic restrictions.'
+            for value in independent_key_restriction[0]:
+                assert value in self.dynamic_restrictions, 'Missing dynamic restriction for value "%s".' % value
+
         return classmethod(__compile__)
+
+    @cached_property
+    def mixin(self):
+        """
+        The finished product for the generated class mixin. It had to be done in two
+            properties due to the method dependency noted below.
+        :rtype: type(DataObject)
+        """
+        # Methods that require the use of super must be attached after instantiation.
+        self.dynamic_class.__init__ = self.init_method
+        self.dynamic_class.__setitem__ = self.setitem_method
+        self.dynamic_class.__compile__ = self.compile_classmethod
+        return self.dynamic_class
 
 
 def dynamic_restriction_mixin(independent_key, dependent_key, **kwargs):
     """
-    Create a mixin class that a DO class can inherit from in order to
+    Create a mixin class that a DO class can inherit to enable dynamic restrictions.
+    See `DynamicClassGenerator` for further instruction.
     :param independent_key: The key that the dynamic restriction depends on.
-    :type independent_key: str
     :param dependent_key: The key where the restriction is dynamic.
-    :type dependent_key: str
-    :param kwargs: The dynamic
+    :param kwargs: The dynamic restrictions.
     :rtype: type(DataObject)
     """
     return DynamicClassGenerator({
         'independent_key': independent_key,
         'dependent_key': dependent_key,
         'dynamic_restrictions': kwargs,
-        }).dynamic_class
+        }).mixin

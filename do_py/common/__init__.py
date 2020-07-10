@@ -4,11 +4,10 @@ Commonly used restrictions.
 """
 
 from datetime import date, datetime
-
 from future.moves import builtins
 
-from do_py.abc import classproperty
 from do_py.data_object import Restriction
+from do_py.utils import classproperty
 
 
 class R(object):

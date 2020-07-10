@@ -1,13 +1,21 @@
 """
 Test the property decorators and related utils.
 """
-from do_py.utils.properties import cached_property, is_cached_property, is_classmethod, is_instancemethod, is_property
+from do_py.utils.properties import cached_property, classproperty, is_cached_property, is_classmethod, \
+    is_instancemethod, is_property
 
 
 class ATest(object):
     """
     Dummy class for testing `is_classmethod` and `is_property`.
     """
+
+    @classproperty
+    def classproperty(cls):
+        """
+        Dummy classproperty.
+        """
+        return 'hello world'
 
     @classmethod
     def classmethod(cls):
@@ -68,3 +76,11 @@ def test_is_cached_property():
     assert is_cached_property(ATest.method) is False
     assert is_cached_property(ATest.prop) is False
     assert is_cached_property(ATest.cached_prop) is True
+
+
+def test_classproperty():
+    """
+    Test the `is_cached_property` util.
+    """
+    assert ATest.classproperty == 'hello world'
+    assert ATest().classproperty == 'hello world'
