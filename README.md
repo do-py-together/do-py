@@ -1,4 +1,6 @@
 # Do-Py
+![Run unit tests.](https://github.com/do-py-together/do-py/workflows/Run%20unit%20tests./badge.svg?branch=master)
+
 Do-Py, shorthand for DataObject Python, is a data-validation and 
 standardization library wrapping Python dictionaries.
 
