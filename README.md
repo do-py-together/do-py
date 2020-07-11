@@ -1,6 +1,7 @@
 # Do-Py
-![build](https://img.shields.io/github/workflow/status/do-py-together/do-py/test?style=flat-square)
 ![release](https://img.shields.io/github/package-json/v/do-py-together/do-py?label=release&logo=release&style=flat-square)
+![build](https://img.shields.io/github/workflow/status/do-py-together/do-py/test?style=flat-square)
+![coverage](https://img.shields.io/codecov/c/github/do-py-together/do-py?style=flat-square)
 
 Do-Py, shorthand for DataObject Python, is a data-validation and 
 standardization library wrapping Python dictionaries.
