@@ -160,6 +160,8 @@ pipenv install --dev
 ```
 
 ### Testing & Code Quality
+Code coverage reports for master, branches, and PRs 
+are posted [here in CodeCov](https://codecov.io/gh/do-py-together/do-py).
 
 ####  Run unit tests
 ```
