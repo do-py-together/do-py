@@ -1,5 +1,13 @@
 # Do-Py
-![Run unit tests.](https://github.com/do-py-together/do-py/workflows/Run%20unit%20tests./badge.svg?branch=master)
+![build](https://img.shields.io/github/workflow/status/do-py-together/do-py/test?style=flat-square)
+![release](https://img.shields.io/github/package-json/v/do-py-together/do-py?label=release&logo=release&style=flat-square)
+
+
+![build](https://github.com/do-py-together/do-py/workflows/build/badge.svg?branch=master)
+
+
+[![license](https://img.shields.io/github/license/do-py-together/do-py/actions-gh-pages.svg)](https://github.com/peaceiris/actions-gh-pages/blob/master/LICENSE)
+[![release](https://img.shields.io/github/release/peaceiris/actions-gh-pages.svg)](https://github.com/peaceiris/actions-gh-pages/releases/latest)
 
 Do-Py, shorthand for DataObject Python, is a data-validation and 
 standardization library wrapping Python dictionaries.
