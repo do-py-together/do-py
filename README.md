@@ -2,6 +2,7 @@
 ![release](https://img.shields.io/github/package-json/v/do-py-together/do-py?label=release&logo=release&style=flat-square)
 ![build](https://img.shields.io/github/workflow/status/do-py-together/do-py/test?style=flat-square)
 ![coverage](https://img.shields.io/codecov/c/github/do-py-together/do-py?style=flat-square)
+![dependencies](https://img.shields.io/librariesio/release/pypi/do-py?style=flat-square)
 
 ##### Our milestones
 ![Beta ready](https://img.shields.io/github/milestones/progress/do-py-together/do-py/1?label=Issues%20until%20Beta&style=flat-square)
