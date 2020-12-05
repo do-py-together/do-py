@@ -5,11 +5,12 @@ Data Object Restrictions.
 
 import copy
 from abc import ABCMeta, abstractmethod, abstractproperty
+from builtins import int, object
 from datetime import date, datetime
 
-from builtins import object
 from future.moves import builtins
 from future.utils import with_metaclass
+from past.builtins import long, unicode
 
 from ..abc import ABCRestrictionMeta
 from ..exceptions import RestrictionError
@@ -394,7 +395,7 @@ class _NullableDataObjectRestriction(SingletonRestriction):
         else:
             return {
                 'properties': {
-                    k: v.es_restrictions for k, v in self.dataobj._restrictions.iteritems()
+                    k: v.es_restrictions for k, v in self.dataobj._restrictions.items()
                     }
                 }
 
@@ -563,7 +564,7 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
 
     def __new__(cls, *args, **kwargs):
         cls._restriction = Restriction.legacy(cls._restriction)
-        return super(ManagedRestrictions, cls).__new__(cls, *args, **kwargs)
+        return super(ManagedRestrictions, cls).__new__(cls)
 
     @abstractproperty
     def _restriction(self):

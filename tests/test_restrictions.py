@@ -5,9 +5,9 @@ Tests for restrictions.
 """
 
 from copy import deepcopy
+from datetime import date, datetime
 
 import pytest
-from datetime import date, datetime
 
 from do_py import DataObject
 from do_py.common import R

@@ -6,10 +6,17 @@ Test managed restrictions.
 import itertools as it
 
 import pytest
+from future.utils import PY3
 
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
 from do_py.data_object.validator import Validator
+
+
+if PY3:
+    imap = map
+else:
+    from itertools import imap
 
 
 class Name(ManagedRestrictions):
@@ -43,12 +50,11 @@ class A(Validator):
     _restrictions = {
         'name': Name(),
         'age': Age(),
-        'city': R(*[e for e in it.chain.from_iterable(city_state.itervalues())]),
+        'city': R(*[e for e in it.chain.from_iterable(city_state.values())]),
         'state': R(*city_state.keys())
         }
 
     def _validate(self):
-        print 'Validating %s %s' % (self.city, self.state)
         assert self.city in city_state[self.state], 'Mismatched city and state'
 
 
@@ -71,7 +77,6 @@ class TestManagedRestrictions(object):
     def test_constructor(self, name, age, city_state):
         city, state = city_state
         a = A(data={'name': name, 'age': age, 'city': city, 'state': state})
-        print 'a=%s' % a
         assert a.name == name.title()
         assert a.age == round(age, 1)
 
@@ -128,8 +133,8 @@ class TestManagedRestrictions(object):
 
         for _k, _v, _city in [(k, v1, city), (k, v2, valid_city)]:
             a.city = _city
-            assert all([e for e in it.imap(f_attr, zip(_k, _v))]), 'Incorrect attrs'
-            assert all([e for e in it.imap(f_item, zip(_k, _v))]), 'Incorrect items'
+            assert all([e for e in imap(f_attr, zip(_k, _v))]), 'Incorrect attrs'
+            assert all([e for e in imap(f_item, zip(_k, _v))]), 'Incorrect items'
 
     @pytest.mark.parametrize('name', ['John Smith'])
     @pytest.mark.parametrize('age', [20])

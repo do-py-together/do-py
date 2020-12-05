@@ -7,10 +7,10 @@ import json
 
 import pytest
 
-from data import A, MyTestException, data, keys, short_data
 from do_py import DataObject
 from do_py.common import R
 from do_py.exceptions import DataObjectError, RestrictionError
+from ..data import A, MyTestException, data, keys, short_data
 
 
 def our_hasattr(instance, name):
@@ -191,8 +191,8 @@ class TestDataObject(object):
         assert c_default.a
         assert type(c_default.a) is A
         assert type(c_default.b) is B
-        for k, v in c_default.a.iteritems():
-            assert v is None, [(k, v) for k, v in c_default.a.iteritems()]
+        for k, v in c_default.a.items():
+            assert v is None, [(k, v) for k, v in c_default.a.items()]
 
     @pytest.mark.parametrize('restrictions', [
         pytest.param(R(A, type(None)), id='([A, type(None)], None)'),

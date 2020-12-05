@@ -16,14 +16,25 @@ class A(DataObject):
         return cls(data=kwargs)
 
 
-data = [(1, 'pulseM', 0),
-        (2, 'speetra', 2),
-        pytest.mark.xfail((2, True, 2)),
-        pytest.mark.xfail((2, 'pulseM', 3))]
+data = [
+    (1, 'pulseM', 0),
+    (2, 'speetra', 2),
+    pytest.param(2, True, 2, marks=pytest.mark.xfail),
+    pytest.param(2, 'pulseM', 3, marks=pytest.mark.xfail)
+    ]
 short_data = [data[0]]
-keys = ['id', 'name', 'status', pytest.mark.xfail('random')]
-key_values = [('id', 1), ('name', 'yay'), ('status', 1),
-              pytest.mark.xfail(('random', 'random'))]
+keys = [
+    'id',
+    'name',
+    'status',
+    pytest.param('random', marks=pytest.mark.xfail)
+    ]
+key_values = [
+    ('id', 1),
+    ('name', 'yay'),
+    ('status', 1),
+    pytest.param('random', 'random', marks=pytest.mark.xfail)
+    ]
 
 
 class MyTestException(Exception):

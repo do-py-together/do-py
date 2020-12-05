@@ -1,5 +1,4 @@
 """
-
 :date_created: 2020-06-28
 """
 from do_py.common import R
@@ -8,9 +7,18 @@ from do_py.exceptions import RestrictionError
 
 
 class ManagedList(ManagedRestrictions):
+    """
+    Use this when you need a restriction for a list of DataObject's.
+    """
     _restriction = R(list, type(None))
 
     def __init__(self, obj_cls, nullable=False):
+        """
+        :param obj_cls: The DO to check each value in the list against.
+        :type obj_cls: DataObject
+        :param nullable: Valid values are a list of Do's or a NoneType.
+        :type nullable: bool
+        """
         super(ManagedList, self).__init__()
         self.obj_cls = obj_cls
         self.nullable = nullable
