@@ -35,10 +35,7 @@ jobs:
           python -c "import sys; print(sys.version)"
           echo $PYTHONPATH
           echo $PATH
-#          pipenv install --dev --skip-lock
           pipenv install --dev
-#          VENV=$(pipenv --venv)
-#          source $VENV/bin/activate
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
 #      # Set up posting code coverage to CodeCov.
 #      - name: Upload coverage to Codecov
