@@ -32,7 +32,10 @@ jobs:
       - name: Test with pytest
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
-          pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
+          python -c "import sys; print(sys.version)"
+          echo $PYTHONPATH
+          echo $PATH
+          pipenv run --python ${{ matrix.python-version }} pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
 #      # Set up posting code coverage to CodeCov.
 #      - name: Upload coverage to Codecov
 #        uses: codecov/codecov-action@v1
