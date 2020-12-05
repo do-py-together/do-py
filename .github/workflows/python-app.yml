@@ -36,7 +36,7 @@ jobs:
           echo $PYTHONPATH
           echo $PATH
           pipenv install --dev
-          pipenv run --python ${{ matrix.python-version }} pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
+          pipenv run ${{ matrix.python-version }} pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
 #      # Set up posting code coverage to CodeCov.
 #      - name: Upload coverage to Codecov
 #        uses: codecov/codecov-action@v1
