@@ -92,16 +92,6 @@ def is_classmethod(cls, method):
     return inspect.ismethod(method) and hasattr(method, '__self__') and getattr(method, '__self__') is cls
 
 
-def is_instancemethod(method):
-    """
-    Check if a method is an instance method.
-    :param method: Name of the method to check
-    :type method: callable
-    :rtype: bool
-    """
-    return inspect.ismethod(method) and hasattr(method, '__self__') and getattr(method, '__self__') is None
-
-
 def is_property(attribute):
     """
     Check if a class attribute is of type property.
