@@ -55,4 +55,3 @@ jobs:
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
-    build_2:
