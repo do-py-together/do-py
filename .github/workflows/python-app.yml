@@ -24,15 +24,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install pipenv
           pipenv install --dev
-      - name: Test with pytest
-        run: |
-          export PYTHONPATH=:$(pwd):$PYTHONPATH
-          pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
       - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
-      # Set up posting code coverage to CodeCov.
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        run: |
+          python -c "import sys; print(sys.version)"
+          echo $PYTHONPATH
+          echo $PATH
+#      - name: Test with pytest
+#        run: |
+#          export PYTHONPATH=:$(pwd):$PYTHONPATH
+#          pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
+#      # Set up posting code coverage to CodeCov.
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v1
 #        with:
 #          fail_ci_if_error: true
           # flags: unittests # optional
