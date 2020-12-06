@@ -5,7 +5,7 @@ Data Object Restrictions.
 
 import copy
 from abc import ABCMeta, abstractmethod, abstractproperty
-from builtins import int, object
+from builtins import object
 from datetime import date, datetime
 
 from future.moves import builtins
