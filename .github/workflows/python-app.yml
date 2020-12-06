@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-#        python-version: [2.7, 3.7, 3.8]
-        python-version: [3.7]
+        python-version: [2.7, 3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -39,7 +38,6 @@ jobs:
           python -c "import sys; print(sys.version)"
           cat Pipfile > Pipfile.tmp
           cat Pipfile.tmp | sed "s/= \"3.8\"/= \"${{ matrix.python-version }}\"/" > Pipfile
-          echo $(cat Pipfile)
           pipenv install --dev
           python -c "import sys; print(sys.version)"
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
