@@ -198,4 +198,3 @@ class R(object):
         :rtype: Restriction
         """
         return cls(int, long, builtins.int, builtins.long, future.types.int, type(None))
-x
