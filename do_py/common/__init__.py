@@ -3,7 +3,7 @@ Commonly used restrictions.
 :date_created: 2020-06-28
 """
 
-from builtins import object, str
+from builtins import object
 from datetime import date, datetime
 
 from future.moves import builtins
