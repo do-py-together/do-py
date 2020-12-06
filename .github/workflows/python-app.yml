@@ -39,6 +39,7 @@ jobs:
           python -c "import sys; print(sys.version)"
           echo $PYTHONPATH
           echo $PATH
+          cat Pipfile | sed "s/python_version = "3.8"/${{ matrix.python-version }}/" > Pipfile
           pipenv install --dev
           python -c "import sys; print(sys.version)"
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
