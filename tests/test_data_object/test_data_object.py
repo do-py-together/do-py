@@ -4,6 +4,7 @@ Test resource base model.
 """
 
 import json
+from builtins import object
 
 import pytest
 

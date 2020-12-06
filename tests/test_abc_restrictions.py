@@ -2,6 +2,8 @@
 :date_created: 2019-08-20
 """
 
+from builtins import object, str
+
 import pytest
 
 from do_py.abc import ABCRestrictionMeta, ABCRestrictions

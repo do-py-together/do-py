@@ -2,21 +2,13 @@
 Test managed restrictions.
 :date_created: 2019-03-12
 """
-
 import itertools as it
-
 import pytest
-from future.utils import PY3
+from builtins import map, object, zip
 
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
 from do_py.data_object.validator import Validator
-
-
-if PY3:
-    imap = map
-else:
-    from itertools import imap
 
 
 class Name(ManagedRestrictions):
@@ -133,8 +125,8 @@ class TestManagedRestrictions(object):
 
         for _k, _v, _city in [(k, v1, city), (k, v2, valid_city)]:
             a.city = _city
-            assert all([e for e in imap(f_attr, zip(_k, _v))]), 'Incorrect attrs'
-            assert all([e for e in imap(f_item, zip(_k, _v))]), 'Incorrect items'
+            assert all([e for e in map(f_attr, zip(_k, _v))]), 'Incorrect attrs'
+            assert all([e for e in map(f_item, zip(_k, _v))]), 'Incorrect items'
 
     @pytest.mark.parametrize('name', ['John Smith'])
     @pytest.mark.parametrize('age', [20])
@@ -149,6 +141,5 @@ class TestManagedRestrictions(object):
             assert False
         except Exception:
             assert True
-            pass
 
         assert a.city == city

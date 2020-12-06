@@ -1,4 +1,6 @@
 import json
+from builtins import object
+
 from datetime import datetime
 
 from do_py.utils.json_encoder import MyJSONEncoder

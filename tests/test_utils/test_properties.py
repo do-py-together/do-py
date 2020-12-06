@@ -1,6 +1,8 @@
 """
 Test the property decorators and related utils.
 """
+from builtins import object
+
 from do_py.utils.properties import cached_property, classproperty, is_cached_property, is_classmethod, is_property
 
 
