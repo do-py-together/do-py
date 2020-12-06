@@ -29,6 +29,10 @@ jobs:
 #          python -c "import sys; print(sys.version)"
 #          echo $PYTHONPATH
 #          echo $PATH
+      - name: Virtual Env
+        run: |
+          virtualenv venv
+          source venv/bin/activate
       - name: Run Unit Tests
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
