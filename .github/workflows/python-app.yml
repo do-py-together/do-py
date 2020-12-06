@@ -37,6 +37,8 @@ jobs:
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
           python -c "import sys; print(sys.version)"
+          cat Pipfile
+          echo $(pwd)
           cat Pipfile | sed "s/= \"3.8\"/= \"${{ matrix.python-version }}\"/" > Pipfile
           echo $(cat Pipfile)
           pipenv install --dev
