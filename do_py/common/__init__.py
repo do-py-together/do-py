@@ -4,9 +4,8 @@ Commonly used restrictions.
 """
 
 import future.types
-from builtins import object
+from builtins import int, list, object, str
 from datetime import date, datetime
-from future.moves import builtins
 from past.builtins import long, unicode
 
 from do_py.data_object import Restriction
@@ -68,7 +67,7 @@ class R(object):
         Shortcut for an int restriction.
         :rtype: Restriction
         """
-        return cls(int, builtins.int, future.types.int)
+        return cls(int, future.types.int)
 
     @classproperty
     def FLOAT(cls):
@@ -76,7 +75,7 @@ class R(object):
         Shortcut for a float restriction.
         :rtype: Restriction
         """
-        return cls(float, builtins.float)
+        return cls(float)
 
     @classproperty
     def STR(cls):
@@ -84,7 +83,7 @@ class R(object):
         Shortcut for string restriction.
         :rtype: Restriction
         """
-        return cls(str, unicode, builtins.str, future.types.str)
+        return cls(str, unicode, future.types.str)
 
     @classproperty
     def NULL_INT(cls):
@@ -92,7 +91,7 @@ class R(object):
         Shortcut for a nullable int restriction.
         :rtype: Restriction
         """
-        return cls(int, builtins.int, future.types.int, type(None))
+        return cls(int, future.types.int, type(None))
 
     @classproperty
     def NULL_FLOAT(cls):
@@ -100,7 +99,7 @@ class R(object):
         Shortcut for a nullable float restriction.
         :rtype: Restriction
         """
-        return cls(float, builtins.float, type(None))
+        return cls(float, type(None))
 
     @classproperty
     def NULL_STR(cls):
@@ -108,7 +107,7 @@ class R(object):
         Shortcut for a nullable strinng restriction.
         :rtype: Restriction
         """
-        return cls(str, unicode, builtins.str, future.types.str, type(None))
+        return cls(str, unicode, future.types.str, type(None))
 
     @classproperty
     def LIST(cls):
@@ -189,7 +188,7 @@ class R(object):
         Shortcut for a long int restriction.
         :rtype: Restriction
         """
-        return cls(int, long, builtins.int, builtins.long, future.types.int)
+        return cls(int, future.types.int, long)
 
     @classproperty
     def NULL_LONG_INT(cls):
@@ -197,4 +196,4 @@ class R(object):
         Shortcut for a nullable long int restriction.
         :rtype: Restriction
         """
-        return cls(int, long, builtins.int, builtins.long, future.types.int, type(None))
+        return cls(int, future.types.int, long, type(None))
