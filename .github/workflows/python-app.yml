@@ -23,11 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pipenv
-#      - name: Display Python version
-#        run: |
-#          python -c "import sys; print(sys.version)"
-#          echo $PYTHONPATH
-#          echo $PATH
       - name: Virtual Env
         run: |
           virtualenv venv
@@ -41,31 +36,6 @@ jobs:
           pipenv install --dev
           python -c "import sys; print(sys.version)"
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
-#      # Set up posting code coverage to CodeCov.
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v1
-#        with:
-#          fail_ci_if_error: true
-          # flags: unittests # optional
-          # name: codecov-umbrella # optional
-#  build_2:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      # Set up Python2.7
-#      - name: Set up Python 2.7
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 2.7
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install pipenv
-#          pipenv --two
-#          pipenv install --dev
-#      - name: Test with pytest
-#        run: |
-#          export PYTHONPATH=:$(pwd):$PYTHONPATH
-#          pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
-#      - name: Display Python version
-#        run: python -c "import sys; print(sys.version)"
+      # Set up posting code coverage to CodeCov.
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
