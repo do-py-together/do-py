@@ -76,7 +76,7 @@ class TestRestriction(object):
     def test_es_restriction(self, parent):
         restriction_tuple = ([int, type(None)], None)
         try:
-            parent(restriction_tuple).es_restrictions
+            _ = parent(restriction_tuple).es_restrictions
             assert False
         except NotImplementedError:
             assert True
