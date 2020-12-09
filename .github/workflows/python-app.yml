@@ -23,18 +23,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pipenv
-      - name: Virtual Env
-        run: |
-          virtualenv venv
-          source venv/bin/activate
       - name: Run Unit Tests
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
-          python -c "import sys; print(sys.version)"
           cat Pipfile > Pipfile.tmp
           cat Pipfile.tmp | sed "s/= \"2.7\"/= \"${{ matrix.python-version }}\"/" > Pipfile
           pipenv install --dev
-          python -c "import sys; print(sys.version)"
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report xml --cov-config=./tests/.coveragerc ./tests/
       # Set up posting code coverage to CodeCov.
       - name: Upload coverage to Codecov
