@@ -74,7 +74,7 @@ class MgdDatetime(ManagedRestrictions):
             if self.dt_obj is date:
                 self.data = self.data.date()
 
-        if self.dt_obj is datetime:
+        if self.data is not None and self.dt_obj is datetime:
             self.data = self.data.replace(microsecond=0)
 
     @classmethod

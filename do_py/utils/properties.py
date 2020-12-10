@@ -3,6 +3,7 @@ Property decorators useful for organizing code in a DO.
 :date_created: 2020-07-10
 """
 
+from builtins import object
 import inspect
 
 
@@ -89,17 +90,6 @@ def is_classmethod(cls, method):
     :rtype: bool
     """
     return inspect.ismethod(method) and hasattr(method, '__self__') and getattr(method, '__self__') is cls
-
-
-def is_instancemethod(method):
-    """
-    Check if a method is a classmethod. Supports Python 2/3.
-    :ref: https://stackoverflow.com/questions/19227724/check-if-a-function-uses-classmethod
-    :param method: Name of the method to check
-    :type method: callable
-    :rtype: bool
-    """
-    return inspect.ismethod(method) and hasattr(method, '__self__') and getattr(method, '__self__') is None
 
 
 def is_property(attribute):

@@ -4,15 +4,20 @@ Data Object Restrictions.
 """
 
 import copy
+import sys
 from abc import ABCMeta, abstractmethod, abstractproperty
-from datetime import date, datetime
 
 from builtins import object
+from datetime import date, datetime
+
 from future.moves import builtins
+from future.types import newint, newlist, newstr
 from future.utils import with_metaclass
+from past.builtins import long, unicode
 
 from ..abc import ABCRestrictionMeta
 from ..exceptions import RestrictionError
+from ..utils import classproperty
 
 
 class AbstractRestriction(tuple):
@@ -394,7 +399,7 @@ class _NullableDataObjectRestriction(SingletonRestriction):
         else:
             return {
                 'properties': {
-                    k: v.es_restrictions for k, v in self.dataobj._restrictions.iteritems()
+                    k: v.es_restrictions for k, v in self.dataobj._restrictions.items()
                     }
                 }
 
@@ -456,7 +461,7 @@ class Restriction(object):
             raise RestrictionError.from_invalid_default_value(default)
         if isinstance(allowed, ManagedRestrictions):
             return _MgdRestRestriction(allowed, default=allowed.default, **kwargs)
-        elif type(allowed) is list:
+        elif type(allowed) in [list, newlist]:
             if len(allowed) == 0:
                 return _ListNoRestriction(allowed, default=default, **kwargs)
             elif len(allowed) == 2 and ABCRestrictionMeta in [type(e) for e in allowed]:
@@ -563,7 +568,7 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
 
     def __new__(cls, *args, **kwargs):
         cls._restriction = Restriction.legacy(cls._restriction)
-        return super(ManagedRestrictions, cls).__new__(cls, *args, **kwargs)
+        return super(ManagedRestrictions, cls).__new__(cls)
 
     @abstractproperty
     def _restriction(self):
@@ -655,22 +660,33 @@ class ESEncoder(object):
     Convert restrictions into ES Document Property Map
     Ref: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
     """
-    # NOTE: Managing nested dictionary?
-    encoding = {
-        int: ESR.INT,
-        long: ESR.INT,
-        builtins.int: ESR.INT,
-        float: ESR.FLOAT,
-        builtins.float: ESR.FLOAT,
-        datetime: ESR.DATE,
-        date: ESR.DATE,
-        bool: ESR.BOOL,
-        str: ESR.STR,
-        builtins.str: ESR.STR,
-        unicode: ESR.STR,
-        'keyword': ESR.KEYWORD,
-        # list: {},
-        }
+
+    @classproperty
+    def encoding(cls):
+        """
+        :rtype: dict
+        """
+        encoding = {
+            int: ESR.INT,
+            long: ESR.INT,
+            builtins.int: ESR.INT,
+            float: ESR.FLOAT,
+            builtins.float: ESR.FLOAT,
+            datetime: ESR.DATE,
+            date: ESR.DATE,
+            bool: ESR.BOOL,
+            str: ESR.STR,
+            builtins.str: ESR.STR,
+            unicode: ESR.STR,
+            'keyword': ESR.KEYWORD,
+            # list: {},
+            }
+        if sys.version_info.major == 3:
+            encoding.update({
+                newint.newint: ESR.INT,
+                newstr.newstr: ESR.STR
+                })
+        return encoding
 
     @classmethod
     def default(cls, obj):

@@ -4,6 +4,7 @@ Tests for restrictions.
 :author: AJ
 """
 
+from builtins import object
 from copy import deepcopy
 
 import pytest
@@ -75,7 +76,7 @@ class TestRestriction(object):
     def test_es_restriction(self, parent):
         restriction_tuple = ([int, type(None)], None)
         try:
-            parent(restriction_tuple).es_restrictions
+            _ = parent(restriction_tuple).es_restrictions
             assert False
         except NotImplementedError:
             assert True

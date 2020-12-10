@@ -1,11 +1,10 @@
 """
-
 :date_created: 2020-06-28
 """
-
-from datetime import datetime
+from builtins import object
 
 import pytest
+from datetime import datetime
 
 from do_py.common.managed_datetime import MgdDatetime
 from do_py.exceptions import RestrictionError
