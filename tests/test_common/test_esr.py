@@ -63,6 +63,6 @@ class TestESR(object):
 class TestESEncoder(object):
 
     @pytest.mark.parametrize('datatype, mapping',
-                             ESEncoder.encoding.items() + [pytest.param(ESEncoder, None, marks=pytest.mark.xfail())])
+                             list(ESEncoder.encoding.items()) + [pytest.param(ESEncoder, None, marks=pytest.mark.xfail())])
     def test_encoding(self, datatype, mapping):
         assert ESEncoder.default(datatype) == mapping
