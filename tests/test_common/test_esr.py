@@ -8,7 +8,7 @@ import pytest
 
 from do_py import DataObject
 from do_py.common import R
-from do_py.data_object.restriction import ESR
+from do_py.data_object.restriction import ESEncoder, ESR
 from do_py.exceptions import RestrictionError
 
 
@@ -58,3 +58,11 @@ class TestESR(object):
         :type data_object: DataObject
         """
         assert ESR.NESTED(data_object)
+
+
+class TestESEncoder(object):
+
+    @pytest.mark.parametrize('datatype, mapping',
+                             ESEncoder.encoding.items() + [pytest.param(ESEncoder, None, marks=pytest.mark.xfail())])
+    def test_encoding(self, datatype, mapping):
+        assert ESEncoder.default(datatype) == mapping
