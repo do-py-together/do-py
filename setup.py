@@ -34,6 +34,9 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/do-py-together/do-py',
     packages=setuptools.find_packages(),
+    include={
+        "": ["*.json"],
+        },
     # https://pypi.org/classifiers/
     classifiers=[
         'Development Status :: 3 - Alpha',
