@@ -33,6 +33,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/do-py-together/do-py',
+    install_requires=[
+        'future==0.18.2'
+        ],
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     # https://pypi.org/classifiers/
     classifiers=[

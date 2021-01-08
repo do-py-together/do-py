@@ -7,7 +7,7 @@ verify_ssl = true
 lint = "pylint do_py"
 
 [packages]
-future = "==0.18.2"
+do-py = { editable = true, path = "." }
 
 [dev-packages]
 pytest = "==4.6.0"
