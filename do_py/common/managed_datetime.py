@@ -7,7 +7,6 @@ from datetime import date, datetime
 
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
-from do_py.exceptions import RestrictionError
 
 
 class MgdDatetime(ManagedRestrictions):
@@ -50,13 +49,17 @@ class MgdDatetime(ManagedRestrictions):
         :type dt_obj: Type[Union[datetime, date]]
         :param default_key: Manages "from" or "to"
         :type default_key: str
+        :type nullable: bool
         """
         assert dt_obj in self._parse_dt_fmt, 'Invalid "dt_obj"(=%s)' % dt_obj
         assert default_key is None or default_key in self.defaults, 'Invalid "default_key"(=%s)' % default_key
         self.dt_obj = dt_obj
         self.default_key = default_key
         self.nullable = nullable
-        self._restriction = R.DATETIME if self.dt_obj is datetime else R.DATE
+        if self.dt_obj is datetime:
+            self._restriction = R.NULL_DATETIME if self.nullable else R.DATETIME
+        else:
+            self._restriction = R.NULL_DATE if self.nullable else R.DATE
         super(MgdDatetime, self).__init__(*args, **kwargs)
 
     def manage(self):
@@ -67,13 +70,12 @@ class MgdDatetime(ManagedRestrictions):
         if self.data is None:
             if self.default_key:
                 self.data = self.defaults[self.default_key](self.dt_obj)
-            elif not self.nullable:
-                raise RestrictionError.bad_data(self.data, self._restriction.allowed)
         elif type(self.data) not in [datetime, date]:
             self.data = datetime.strptime(self.data, self._parse_dt_fmt[self.dt_obj])
             if self.dt_obj is date:
                 self.data = self.data.date()
 
+        self._restriction(self.data)
         if self.data is not None and self.dt_obj is datetime:
             self.data = self.data.replace(microsecond=0)
 
@@ -120,6 +122,14 @@ class MgdDatetime(ManagedRestrictions):
         :rtype: MgdDatetime
         """
         return cls(dt_obj=datetime)
+
+    @classmethod
+    def null_datetime(cls):
+        """
+        Create MgdDatetime instance for validating and standardizing a DATETIME format that is nullable.
+        :rtype: MgdDatetime
+        """
+        return cls(dt_obj=datetime, nullable=True)
 
     @classmethod
     def date(cls):
