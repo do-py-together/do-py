@@ -44,7 +44,7 @@ class TestMgdDatetime(object):
     @pytest.mark.parametrize('input, output', [
         (test_dt_instance, test_dt_instance),
         (test_dt_instance.isoformat(), test_dt_instance),
-        (None, test_dt_instance_epoch   )
+        (None, test_dt_instance_epoch)
         ])
     def test_from_datetime(self, input, output):
         """
