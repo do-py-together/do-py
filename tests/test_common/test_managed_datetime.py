@@ -39,7 +39,8 @@ class TestMgdDatetime(object):
         The correct restriction should be used depending on dt_obj and nullable.
         """
         instance = MgdDatetime(dt_obj=dt_obj, default_key=default_key, nullable=nullable)
-        assert instance._restriction == expected_restriction
+        if instance._restriction != expected_restriction:
+            raise Exception('instance._restriction != expected_restriction')
 
     @pytest.mark.parametrize('input, output', [
         (test_dt_instance, test_dt_instance),
