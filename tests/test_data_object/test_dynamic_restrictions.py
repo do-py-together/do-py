@@ -2,9 +2,8 @@
 Test dynamic restriction class creation, inheritance and usage.
 :date_created: 2020-07-10
 """
-from builtins import object
-
 import pytest
+from builtins import object
 
 from do_py import DataObject, R
 from do_py.data_object.dynamic_restrictions import dynamic_restriction_mixin
@@ -168,3 +167,31 @@ class TestInheritance(object):
                 }
 
         assert Breakfast2
+
+    def test_restriction_update_by_value(self):
+        """
+        TODO
+        """
+        # Validate the starting condition.
+        assert Breakfast._restrictions['item_metadata'] == R()
+        milk = Breakfast({
+            'item': 'milk',
+            'item_metadata': MilkMetadata({
+                'flavor': 'chocolate'
+                })
+            })
+        # Ensure the instance's restrictions were updated correctly.
+        assert milk._restrictions['item_metadata'] == MilkMetadata
+
+        # Validate the class restrictions were not touched.
+        assert Breakfast._restrictions['item_metadata'] == R()
+
+        # Validate a second instance is created correctly and the restrictions do not clash.
+        milk = Breakfast({
+            'item': 'cereal',
+            'item_metadata': CerealMetadata({
+                'brand': 'cheerios'
+                })
+            })
+        assert milk._restrictions['item_metadata'] == CerealMetadata
+        assert Breakfast._restrictions['item_metadata'] == R()
