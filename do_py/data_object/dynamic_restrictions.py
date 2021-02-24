@@ -3,6 +3,8 @@ Dynamic restrictions for a DataObject.
 :date_created: 2020-07-10
 :author: Gian Brazzini
 """
+import copy
+
 from do_py import DataObject, R
 from do_py.abc import ABCRestrictionMeta
 from do_py.data_object.restriction import ManagedRestrictions, _ListValueRestriction
@@ -83,6 +85,9 @@ class DynamicClassGenerator(DataObject):
         """
 
         def __init__(instance_self, data, **init_kwargs):
+            # Each instance is required to have a copy of the restrictions, otherwise the restrictions are shared by
+            # reference.
+            instance_self._restrictions = copy.deepcopy(instance_self._restrictions)
             super(self.dynamic_class, instance_self).__init__(data, **init_kwargs)
             getattr(instance_self, self.update_fn_name)()
 
