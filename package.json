@@ -1,8 +1,7 @@
 {
     "name": "do-py",
-    "description": "Standardized data structures for Python.",
-    "version": "0.2.7",
-    "main": "index.js",
+    "description": "Data validation and standardization library wrapping Python dictionaries.",
+    "version": "0.2.8",
     "repository": "git@github.com:do-py-together/do-py.git",
     "author": "Tim Davis <timdavis.3991@gmail.com>",
     "license": "MIT",

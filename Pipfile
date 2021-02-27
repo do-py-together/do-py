@@ -4,7 +4,9 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [scripts]
+build_readme = "python examples/build_readme.py"
 lint = "pylint do_py"
+test = "pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/"
 
 [packages]
 do-py = { editable = true, path = "." }
