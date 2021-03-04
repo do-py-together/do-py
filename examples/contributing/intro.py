@@ -1,5 +1,5 @@
 """
-Introduction.
+Developer introduction.
 At its most basic level, a DataObject is built of something called a restricted dict mixin. A `RestrictedDictMixin` is
 simply a class that inherits from python dict type. This just allows for certain parts of the built-in python dictionary
 to be excluded to help prevent unwanted things from occurring. In this class it just takes several of the built-in
