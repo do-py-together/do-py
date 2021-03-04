@@ -2,7 +2,7 @@
 Give the DataObject default values.
 DataObjects are able to define the default value for their restrictions. If a developer is not sure
 if a value will be available, defaults are a very useful utility. We have updated the original example to have
-a default value for it's restriction `favorite_candy.`
+a default values `favorite_number` and `favorite_candy`.
 
 In order to use the default value when instantiating a DataObject, we must instantiate it in non-strict mode.
 
@@ -11,7 +11,7 @@ keys defined in the DataObject's `_restrictions`.
 
 With non-strict initialization, it is acceptable to have some keys missing per DO _restrictions. For all missing keys,
 the default restriction value is used. This section provides an example of using a DataObject in non-strict mode
-so that we can use the default values for `favorite_candy`.
+so that we can use the default values for `favorite_number` and `favorite_candy`.
 """
 from do_py import DataObject, R
 
