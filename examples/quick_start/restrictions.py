@@ -35,12 +35,16 @@ class TypeShorCuts(DataObject):
 class ValueRestrictions(DataObject):
     """
     All of the restrictions for this class are value restrictions.
+    :restriction integers: This allows for numbers 1, 2, and 3.
+    :restriction integers_and_none: This allows for numbers 1, 2, and 3, but also `None`.
+    :restriction strings: This allows for numbers 'hello', 'hi', and 'sup'.
+    :restriction strings_and_none: This allows for numbers 'hello', 'hi', and 'sup', but also `None`.
     """
     _restrictions = {
         # number values
         'integers': R(1, 2, 3),
-        'integers and None': R(1, 2, 3, None),
+        'integers_and_none': R(1, 2, 3, None),
         # string values
         'strings': R('hello', 'hi', 'sup'),
-        'nullable_strings': R('hello', 'hi', 'sup', None),
+        'strings_and_none': R('hello', 'hi', 'sup', None),
         }
