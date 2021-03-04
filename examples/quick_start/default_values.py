@@ -1,5 +1,5 @@
 """
-Give the DataObject restriction default values.
+Give the DataObject default values.
 DataObjects are able to define the default value for their restrictions. If a developer is not sure
 if a value will be available, defaults are a very useful utility. We have updated the original example to have
 a default value for it's restriction `favorite_candy.`
@@ -18,24 +18,20 @@ from do_py import DataObject, R
 
 class MyFavoriteStuff(DataObject):
     """
-    :restriction favorite_number: The number I favor the most. Strings not allowed.
-    :restriction favorite_candy: If we don't know what someone's favorite candy is, the default is "Unknown".
-    :restriction favorite_movie: My favorite movie. This is optional because a `None` IS allowed!
+    :restriction favorite_number: The default value is 1.
+    :restriction favorite_candy: The default value is is "Unknown".
+    :restriction favorite_movie: When nullable, the default value is `None`.
     """
     _restrictions = {
-        'favorite_number': R.INT,
+        'favorite_number': R.INT.with_default(1),
         'favorite_candy': R('Jolly Ranchers', 'Nerds', 'Unknown', default='Unknown'),
         'favorite_movie': R.NULL_STR
         }
 
 
 # In order to use the default value when instantiating a DataObject, we must instantiate it in non-strict mode.
-instance = MyFavoriteStuff({
-    'favorite_number': 1985,
-    'favorite_candy': 'Jolly Ranchers'
-    }, strict=False)
+# Any values that are not provided will use defaults.
+instance = MyFavoriteStuff({}, strict=False)
 
 print(instance)
-# output: MyFavoriteStuff{"favorite_candy": "Jolly Ranchers", "favorite_number": 1985, "favorite_movie": null}
-print(instance.favorite_candy)
-# output: Jolly Ranchers
+# output: MyFavoriteStuff{"favorite_candy": "Unknown", "favorite_number": 1, "favorite_movie": null}
