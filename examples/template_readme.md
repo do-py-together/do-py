@@ -51,8 +51,7 @@ pipenv install --dev
 Run unit tests locally with `pipenv run test`. Code coverage reports for master, branches, and PRs are posted
 in [CodeCov](https://codecov.io/gh/do-py-together/do-py).
 
-#### Linting
-
+### Linting
 ```bash
 pipenv run lint
 ```
