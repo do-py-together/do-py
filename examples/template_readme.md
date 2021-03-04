@@ -14,6 +14,7 @@ Do-Py, shorthand for DataObject Python, is a data-validation and standardization
 ## Quick-Start
 
 //example=quick_start/first_instance.py
+//example=quick_start/restrictions.py
 //example=quick_start/default_values.py
 //example=quick_start/nested.py
 //example=quick_start/nested_list.py
