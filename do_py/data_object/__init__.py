@@ -1,8 +1,10 @@
 import copy
 
-from do_py.abc import ABCRestrictions, SystemMessages, ABCRestrictionMeta, classproperty
+from future.utils import PY3
+
+from do_py.abc import ABCRestrictionMeta, ABCRestrictions, SystemMessages, classproperty
 from do_py.data_object.restriction import Restriction
-from do_py.exceptions import RestrictionError, DataObjectError
+from do_py.exceptions import DataObjectError, RestrictionError
 from .restricted_dict import RestrictedDictMixin
 
 
@@ -172,4 +174,39 @@ class DataObject(RestrictedDictMixin):
         return cls._schema
 
     def __dir__(self):
-        return super(DataObject, self).__dir__() + list(self._restrictions.keys())
+        """
+        :ref: https://stackoverflow.com/questions/15507848/what-is-the-correct-way-to-override-the-dir-method
+        """
+        if PY3:
+            return super(DataObject, self).__dir__()
+        else:
+            # http://www.quora.com/How-dir-is-implemented-Is-there-any-PEP-related-to-that
+            def get_attrs(obj):
+                import types
+                if not hasattr(obj, '__dict__'):
+                    return []  # slots only
+                if not isinstance(obj.__dict__, (dict, types.DictProxyType)):
+                    raise TypeError("%s.__dict__ is not a dictionary"
+                                    "" % obj.__name__)
+                return obj.__dict__.keys()
+
+            def dir2(obj):
+                attrs = set()
+                if not hasattr(obj, '__bases__'):
+                    # obj is an instance
+                    if not hasattr(obj, '__class__'):
+                        # slots
+                        return sorted(get_attrs(obj))
+                    klass = obj.__class__
+                    attrs.update(get_attrs(klass))
+                else:
+                    # obj is a class
+                    klass = obj
+
+                for cls in klass.__bases__:
+                    attrs.update(get_attrs(cls))
+                    attrs.update(dir2(cls))
+                attrs.update(get_attrs(obj))
+                return list(attrs)
+
+            return dir2(self)
