@@ -23,7 +23,7 @@ class ATest(object):
         return cls.CLS_VALUE
 
     @cached_classproperty
-    def classproperty(cls):
+    def cached_classproperty(cls):
         """
         Dummy cached_classproperty.
         """
@@ -84,7 +84,7 @@ def test_is_cached_property():
 
 def test_classproperty():
     """
-    Test the `cached_property` decorator.
+    Test the `classproperty` decorator.
     """
     assert ATest.classproperty == ATest.CLS_VALUE
     instance = ATest()
@@ -95,10 +95,8 @@ def test_classproperty():
 
 def test_cached_classproperty():
     """
-    Test the `is_cached_property` util.
+    Test the `cached_classproperty` decorator.
     """
-    assert ATest.classproperty == ATest.CLS_VALUE
-    instance = ATest()
-    assert instance.classproperty == ATest.CLS_VALUE
-    instance.CLS_VALUE = ''
-    assert instance.classproperty == ATest.CLS_VALUE
+    c = ATest.cached_classproperty
+    time.sleep(.5)
+    assert c == ATest.cached_classproperty
