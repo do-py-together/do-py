@@ -3,8 +3,9 @@ Property decorators useful for organizing code in a DO.
 :date_created: 2020-07-10
 """
 
-from builtins import object
 import inspect
+
+from builtins import object
 
 
 class classproperty(object):
@@ -23,7 +24,30 @@ class classproperty(object):
         self.f = f
 
     def __get__(self, instance, owner):
-        return self.f(instance if instance else owner)
+        return self.f(owner)
+
+
+class cached_classproperty(object):
+    """
+    This builds on the same idea as `classproperty`.
+    This is a decorator.
+    https://stackoverflow.com/questions/3203286/how-to-create-a-read-only-class-property-in-python
+    """
+
+    def __init__(self, f):
+        """
+        f is a method in a class that should be a property. This function will be able to access the attribute from
+        class-level. Instances are not required, but the attribute value in the instance is preferred over compile-time.
+        :param f:
+        :rtype: classmethod
+        """
+        self.f = f
+        self.attr = '_%s' % f.__name__
+
+    def __get__(self, instance, owner):
+        if not hasattr(self, self.attr):
+            setattr(self, self.attr, self.f(owner))
+        return getattr(self, self.attr)
 
 
 def cached_property(original_property):
