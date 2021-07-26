@@ -1,22 +1,33 @@
 """
 Test the property decorators and related utils.
 """
+import time
+
 from builtins import object
 
-from do_py.utils.properties import cached_property, classproperty, is_cached_property, is_classmethod, is_property
+from do_py.utils.properties import cached_classproperty, cached_property, classproperty, is_cached_property, \
+    is_classmethod, is_property
 
 
 class ATest(object):
     """
     Dummy class for testing `is_classmethod` and `is_property`.
     """
+    CLS_VALUE = 'hello world'
 
     @classproperty
     def classproperty(cls):
         """
         Dummy classproperty.
         """
-        return 'hello world'
+        return str(cls.CLS_VALUE)
+
+    @cached_classproperty
+    def cached_classproperty(cls):
+        """
+        Dummy cached_classproperty.
+        """
+        return time.time()
 
     @classmethod
     def classmethod(cls):
@@ -73,7 +84,17 @@ def test_is_cached_property():
 
 def test_classproperty():
     """
-    Test the `is_cached_property` util.
+    Test the `classproperty` decorator.
     """
-    assert ATest.classproperty == 'hello world'
-    assert ATest().classproperty == 'hello world'
+    assert ATest.classproperty == ATest.CLS_VALUE
+    instance = ATest()
+    assert instance.classproperty == ATest.CLS_VALUE
+    instance.CLS_VALUE = ''
+    assert instance.classproperty == ATest.CLS_VALUE
+
+
+def test_cached_classproperty():
+    """
+    Test the `cached_classproperty` decorator.
+    """
+    assert id(ATest.cached_classproperty) == id(ATest.cached_classproperty)

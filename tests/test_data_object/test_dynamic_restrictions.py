@@ -37,7 +37,13 @@ class Breakfast(dynamic_item):
     _restrictions = {
         'item': R('milk', 'cereal'),
         'item_metadata': R(),
+        'name': R.NULL_STR
         }
+
+    def __init__(self, data=None, **kwargs):
+        if data and 'name' not in data:
+            data['name'] = None
+        super(Breakfast, self).__init__(data=data, **kwargs)
 
 
 class TestDynamicDataObject(object):
@@ -168,9 +174,9 @@ class TestInheritance(object):
 
         assert Breakfast2
 
-    def test_restriction_update_by_value(self):
+    def test_restrictions(self):
         """
-        TODO
+        Test that the restrictions update when the value is updated.
         """
         # Validate the starting condition.
         assert Breakfast._restrictions['item_metadata'] == R()
@@ -195,3 +201,27 @@ class TestInheritance(object):
             })
         assert milk._restrictions['item_metadata'] == CerealMetadata
         assert Breakfast._restrictions['item_metadata'] == R()
+
+    def test_restriction_update_by_value(self):
+        """
+        Test that the restrictions update when the value is updated.
+        """
+        # Validate the starting condition.
+        assert Breakfast._restrictions['item_metadata'] == R()
+        milk = Breakfast({
+            'item': 'milk',
+            'item_metadata': MilkMetadata({
+                'flavor': 'chocolate'
+                })
+            })
+        # Ensure the instance's restrictions were updated correctly.
+        assert milk._restrictions['item_metadata'] == MilkMetadata
+
+        cereal = Breakfast({
+            'item': 'cereal',
+            'item_metadata': CerealMetadata({
+                'brand': 'frosted-flakes'
+                })
+            })
+        assert cereal._restrictions['item_metadata'] == CerealMetadata
+        assert milk._restrictions['item_metadata'] == MilkMetadata
