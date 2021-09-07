@@ -39,6 +39,8 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     # https://pypi.org/classifiers/
     classifiers=[
+        'Development Status :: 4 - Beta',
+
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'Operating System :: OS Independent',
