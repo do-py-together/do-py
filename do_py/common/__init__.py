@@ -71,8 +71,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(int, newint)
-        return cls(int, newint)
+            return cls(int, newint.newint)
+        return cls(int, newint.newint)
 
     @classproperty
     def FLOAT(cls):
@@ -89,8 +89,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(str, newstr)
-        return cls(str, unicode, newstr)
+            return cls(str, newstr.newstr)
+        return cls(str, unicode, newstr.newstr)
 
     @classproperty
     def NULL_INT(cls):
@@ -99,8 +99,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(int, newint, type(None))
-        return cls(int, newint, type(None))
+            return cls(int, newint.newint, type(None))
+        return cls(int, newint.newint, type(None))
 
     @classproperty
     def NULL_FLOAT(cls):
@@ -117,8 +117,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(str, newstr, type(None))
-        return cls(str, unicode, newstr, type(None))
+            return cls(str, newstr.newstr, type(None))
+        return cls(str, unicode, newstr.newstr, type(None))
 
     @classproperty
     def LIST(cls):
@@ -127,8 +127,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(list, newlist)
-        return cls(list, newlist)
+            return cls(list, newlist.newlist)
+        return cls(list, newlist.newlist)
 
     @classproperty
     def SET(cls):
@@ -145,8 +145,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(list, newlist, type(None))
-        return cls(list, newlist, type(None))
+            return cls(list, newlist.newlist, type(None))
+        return cls(list, newlist.newlist, type(None))
 
     @classproperty
     def BOOL(cls):
@@ -204,8 +204,8 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(int, newint, long)
-        return cls(int, newint, long)
+            return cls(int, newint.newint, long)
+        return cls(int, newint.newint, long)
 
     @classproperty
     def NULL_LONG_INT(cls):
@@ -214,5 +214,5 @@ class R(object):
         :rtype: Restriction
         """
         if IS_PY3:
-            return cls(int, newint, long, type(None))
-        return cls(int, newint, long, type(None))
+            return cls(int, newint.newint, long, type(None))
+        return cls(int, newint.newint, long, type(None))

@@ -119,15 +119,15 @@ class TestRestriction(object):
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_null_str_values(self, data):
-        assert SampleC._restrictions['t'](data)
+        SampleC._restrictions['t'](data)
 
     @pytest.mark.parametrize('data', [
         'a', newstr.newstr('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
-        pytest.param(type(None), marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
+        pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_str_values(self, data):
-        assert SampleC._restrictions['u'](data)
+        SampleC._restrictions['u'](data)
 
     @pytest.mark.parametrize('data', [
         1, 2, 3, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
