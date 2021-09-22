@@ -68,7 +68,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(int, newint.newint)
+            return cls(int, newint)
         return cls(int, newint)
 
     @classproperty
@@ -86,7 +86,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(str, unicode, newstr.newstr)
+            return cls(str, unicode, newstr)
         return cls(str, unicode, newstr)
 
     @classproperty
@@ -96,7 +96,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(int, newint.newint, type(None))
+            return cls(int, newint, type(None))
         return cls(int, newint, type(None))
 
     @classproperty
@@ -110,11 +110,11 @@ class R(object):
     @classproperty
     def NULL_STR(cls):
         """
-        Shortcut for a nullable strinng restriction.
+        Shortcut for a nullable string restriction.
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(str, unicode, newstr.newstr, type(None))
+            return cls(str, newstr, type(None))
         return cls(str, unicode, newstr, type(None))
 
     @classproperty
@@ -124,7 +124,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(list, newlist.newlist)
+            return cls(list, newlist)
         return cls(list, newlist)
 
     @classproperty
@@ -142,7 +142,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(list, newlist.newlist, type(None))
+            return cls(list, newlist, type(None))
         return cls(list, newlist, type(None))
 
     @classproperty
@@ -201,7 +201,7 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(int, newint.newint, long)
+            return cls(int, newint, long)
         return cls(int, newint, long)
 
     @classproperty
@@ -211,5 +211,5 @@ class R(object):
         :rtype: Restriction
         """
         if sys.version_info.major == 3:
-            return cls(int, newint.newint, long, type(None))
+            return cls(int, newint, long, type(None))
         return cls(int, newint, long, type(None))

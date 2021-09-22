@@ -6,7 +6,7 @@ Tests for restrictions.
 
 from builtins import object
 from copy import deepcopy
-
+from future.types import newstr
 import pytest
 from datetime import date, datetime
 
@@ -40,6 +40,7 @@ class SampleB(DataObject):
 
 class SampleC(DataObject):
     _restrictions = {
+        'u': R.STR,
         'v': [1, 2, 3],
         'w': R.NULL_FLOAT,
         'x': R(SampleB, type(None)),
@@ -111,6 +112,13 @@ class TestRestriction(object):
         assert SampleC._restrictions['y'].es_restrictions == {'properties': {'x': {'type': 'integer'}}}
         assert type(SampleC._restrictions['z']) is _MgdRestRestriction
         assert SampleC._restrictions['z'].es_restrictions is None
+
+    @pytest.mark.parametrize('data', [
+        'a', newstr.newstr('b'),
+        pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
+        ])
+    def test_str_values(self, data):
+        assert SampleC._restrictions['u'](data)
 
     @pytest.mark.parametrize('data', [
         1, 2, 3, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
