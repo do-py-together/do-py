@@ -19,3 +19,4 @@ py2to3cov/
 # Misc
 .idea/
 .DS_Store
+.python-version
