@@ -10,9 +10,10 @@ from do_py.common import R
 
 
 class TestR(object):
-    def test_r_constants(self):
-        for attr in [r for r in dir(R) if not r.startswith('__')]:
-            assert getattr(R, attr)
+
+    @pytest.mark.parametrize('attr', [r for r in dir(R) if not r.startswith('__')])
+    def test_r_constants(self, attr):
+        assert getattr(R, attr)
 
     @pytest.mark.parametrize('args, kwargs', [
         ([], {}),

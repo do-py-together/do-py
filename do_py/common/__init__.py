@@ -3,13 +3,16 @@ Commonly used restrictions.
 :date_created: 2020-06-28
 """
 import sys
-from datetime import date, datetime
 
+from datetime import date, datetime
 from future.types import newint, newlist, newstr
 from past.builtins import long, unicode
 
 from do_py.data_object import Restriction
 from do_py.utils import classproperty
+
+
+IS_PY3 = sys.version_info.major == 3
 
 
 class R(object):
@@ -67,9 +70,7 @@ class R(object):
         Shortcut for an int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(int, newint.newint)
-        return cls(int, newint)
+        return cls(int, newint.newint)
 
     @classproperty
     def FLOAT(cls):
@@ -85,9 +86,10 @@ class R(object):
         Shortcut for string restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(str, unicode, newstr.newstr)
-        return cls(str, unicode, newstr)
+        types = [str, newstr.newstr]
+        if not IS_PY3:
+            types.append(unicode)
+        return cls(*types)
 
     @classproperty
     def NULL_INT(cls):
@@ -95,9 +97,7 @@ class R(object):
         Shortcut for a nullable int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(int, newint.newint, type(None))
-        return cls(int, newint, type(None))
+        return cls(int, newint.newint, type(None))
 
     @classproperty
     def NULL_FLOAT(cls):
@@ -110,12 +110,13 @@ class R(object):
     @classproperty
     def NULL_STR(cls):
         """
-        Shortcut for a nullable strinng restriction.
+        Shortcut for a nullable string restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(str, unicode, newstr.newstr, type(None))
-        return cls(str, unicode, newstr, type(None))
+        types = [str, newstr.newstr, type(None)]
+        if not IS_PY3:
+            types.append(unicode)
+        return cls(*types)
 
     @classproperty
     def LIST(cls):
@@ -123,9 +124,7 @@ class R(object):
         Shortcut for a list restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(list, newlist.newlist)
-        return cls(list, newlist)
+        return cls(list, newlist.newlist)
 
     @classproperty
     def SET(cls):
@@ -141,9 +140,7 @@ class R(object):
         Shortcut for a nullable list restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(list, newlist.newlist, type(None))
-        return cls(list, newlist, type(None))
+        return cls(list, newlist.newlist, type(None))
 
     @classproperty
     def BOOL(cls):
@@ -200,9 +197,7 @@ class R(object):
         Shortcut for a long int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(int, newint.newint, long)
-        return cls(int, newint, long)
+        return cls(int, newint.newint, long)
 
     @classproperty
     def NULL_LONG_INT(cls):
@@ -210,6 +205,4 @@ class R(object):
         Shortcut for a nullable long int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(int, newint.newint, long, type(None))
-        return cls(int, newint, long, type(None))
+        return cls(int, newint.newint, long, type(None))
