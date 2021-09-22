@@ -3,13 +3,16 @@ Commonly used restrictions.
 :date_created: 2020-06-28
 """
 import sys
-from datetime import date, datetime
 
+from datetime import date, datetime
 from future.types import newint, newlist, newstr
 from past.builtins import long, unicode
 
 from do_py.data_object import Restriction
 from do_py.utils import classproperty
+
+
+IS_PY3 = sys.version_info.major == 3
 
 
 class R(object):
@@ -67,7 +70,7 @@ class R(object):
         Shortcut for an int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(int, newint)
         return cls(int, newint)
 
@@ -85,8 +88,8 @@ class R(object):
         Shortcut for string restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
-            return cls(str, unicode, newstr)
+        if IS_PY3:
+            return cls(str, newstr)
         return cls(str, unicode, newstr)
 
     @classproperty
@@ -95,7 +98,7 @@ class R(object):
         Shortcut for a nullable int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(int, newint, type(None))
         return cls(int, newint, type(None))
 
@@ -113,7 +116,7 @@ class R(object):
         Shortcut for a nullable string restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(str, newstr, type(None))
         return cls(str, unicode, newstr, type(None))
 
@@ -123,7 +126,7 @@ class R(object):
         Shortcut for a list restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(list, newlist)
         return cls(list, newlist)
 
@@ -141,7 +144,7 @@ class R(object):
         Shortcut for a nullable list restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(list, newlist, type(None))
         return cls(list, newlist, type(None))
 
@@ -200,7 +203,7 @@ class R(object):
         Shortcut for a long int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(int, newint, long)
         return cls(int, newint, long)
 
@@ -210,6 +213,6 @@ class R(object):
         Shortcut for a nullable long int restriction.
         :rtype: Restriction
         """
-        if sys.version_info.major == 3:
+        if IS_PY3:
             return cls(int, newint, long, type(None))
         return cls(int, newint, long, type(None))

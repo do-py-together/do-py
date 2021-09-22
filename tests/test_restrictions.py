@@ -40,6 +40,7 @@ class SampleB(DataObject):
 
 class SampleC(DataObject):
     _restrictions = {
+        't': R.NULL_STR,
         'u': R.STR,
         'v': [1, 2, 3],
         'w': R.NULL_FLOAT,
@@ -114,8 +115,16 @@ class TestRestriction(object):
         assert SampleC._restrictions['z'].es_restrictions is None
 
     @pytest.mark.parametrize('data', [
-        'a', newstr.newstr('b'),
+        None, 'a', newstr.newstr('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
+        ])
+    def test_null_str_values(self, data):
+        assert SampleC._restrictions['t'](data)
+
+    @pytest.mark.parametrize('data', [
+        'a', newstr.newstr('b'),
+        pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
+        pytest.param(type(None), marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_str_values(self, data):
         assert SampleC._restrictions['u'](data)
