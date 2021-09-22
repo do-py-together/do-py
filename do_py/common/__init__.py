@@ -70,8 +70,6 @@ class R(object):
         Shortcut for an int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint)
         return cls(int, newint.newint)
 
     @classproperty
@@ -88,9 +86,10 @@ class R(object):
         Shortcut for string restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(str, newstr.newstr)
-        return cls(str, unicode, newstr.newstr)
+        types = [str, newstr.newstr]
+        if not IS_PY3:
+            types.append(unicode)
+        return cls(*types)
 
     @classproperty
     def NULL_INT(cls):
@@ -98,8 +97,6 @@ class R(object):
         Shortcut for a nullable int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, type(None))
         return cls(int, newint.newint, type(None))
 
     @classproperty
@@ -116,9 +113,10 @@ class R(object):
         Shortcut for a nullable string restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(str, newstr.newstr, type(None))
-        return cls(str, unicode, newstr.newstr, type(None))
+        types = [str, newstr.newstr, type(None)]
+        if not IS_PY3:
+            types.append(unicode)
+        return cls(*types)
 
     @classproperty
     def LIST(cls):
@@ -126,8 +124,6 @@ class R(object):
         Shortcut for a list restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(list, newlist.newlist)
         return cls(list, newlist.newlist)
 
     @classproperty
@@ -144,8 +140,6 @@ class R(object):
         Shortcut for a nullable list restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(list, newlist.newlist, type(None))
         return cls(list, newlist.newlist, type(None))
 
     @classproperty
@@ -203,8 +197,6 @@ class R(object):
         Shortcut for a long int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, long)
         return cls(int, newint.newint, long)
 
     @classproperty
@@ -213,6 +205,4 @@ class R(object):
         Shortcut for a nullable long int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, long, type(None))
         return cls(int, newint.newint, long, type(None))
