@@ -9,7 +9,6 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 
 from builtins import object
 from datetime import date, datetime
-
 from future.moves import builtins
 from future.types import newint, newlist, newstr
 from future.utils import with_metaclass
@@ -105,11 +104,13 @@ class AbstractRestriction(tuple):
         return tuple(self)
 
     def __deepcopy__(self, memodict={}):
-        memodict[id(self)] = self.__copy__()
+        """
+        NOTE: `deepcopy` uses memoization to store a previously copied instance.
+        """
         _r = copy.deepcopy(self.__copy__())
-        # instance = self.__class__(_r[0], default=_r[1])
-        # memodict[id(self)] = instance
-        return self.__class__(_r[0], default=_r[1])
+        instance = self.__class__(_r[0], default=_r[1])
+        memodict[id(self)] = instance
+        return instance
 
 
 def is_immutable(obj):

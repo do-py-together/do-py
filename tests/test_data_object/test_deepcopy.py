@@ -35,9 +35,9 @@ class TestDataObjectCopy(object):
 
     def test_deepcopy(self):
         """
-        Test rebuilding the restrictions after cloning via `deepcopy`.
+        Test rebuilding the restrictions after cloning via `deepcopy`. `deepcopy` uses memoization to store a
+            previously copied instance.
         """
-        # This fails. The value for `city` is tuple and not restriction.
         copy = deepcopy(Address._restrictions)
         for key in copy:
             Restriction.legacy(copy[key])
