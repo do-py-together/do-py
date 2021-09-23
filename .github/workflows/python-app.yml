@@ -27,6 +27,7 @@ jobs:
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
           pipenv --python ${{ matrix.python-version }}
+          rm Pipfile.lock
           pipenv install --dev
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
       # Set up posting code coverage to CodeCov.
