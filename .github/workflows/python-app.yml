@@ -26,10 +26,11 @@ jobs:
       - name: Run Unit Tests
         run: |
           export PYTHONPATH=:$(pwd):$PYTHONPATH
-          cat Pipfile > Pipfile.tmp
-          cat Pipfile.tmp | sed "s/= \"2.7\"/= \"${{ matrix.python-version }}\"/" > Pipfile
+          pipenv --python ${{ matrix.python-version }}
           pipenv install --dev
           pipenv run pytest -so xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov-report html --cov-report xml --junitxml test-reports/tests.xml --cov-config=./tests/.coveragerc ./tests/
+        with:
+          python-version: ${{ matrix.python-version }}
       # Set up posting code coverage to CodeCov.
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
