@@ -107,6 +107,8 @@ class AbstractRestriction(tuple):
     def __deepcopy__(self, memodict={}):
         memodict[id(self)] = self.__copy__()
         _r = copy.deepcopy(self.__copy__())
+        # instance = self.__class__(_r[0], default=_r[1])
+        # memodict[id(self)] = instance
         return self.__class__(_r[0], default=_r[1])
 
 
