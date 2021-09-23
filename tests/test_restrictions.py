@@ -9,6 +9,7 @@ from copy import deepcopy
 from future.types import newstr
 import pytest
 from datetime import date, datetime
+from future.utils import PY3
 
 from do_py import DataObject
 from do_py.common import R
@@ -115,14 +116,17 @@ class TestRestriction(object):
         assert SampleC._restrictions['z'].es_restrictions is None
 
     @pytest.mark.parametrize('data', [
-        None, 'a', newstr.newstr('b'),
+        None,
+        'a',
+        newstr.newstr('b') if PY3 else newstr('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_null_str_values(self, data):
         SampleC._restrictions['t'](data)
 
     @pytest.mark.parametrize('data', [
-        'a', newstr.newstr('b'),
+        'a',
+        newstr.newstr('b') if PY3 else newstr('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
         pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])

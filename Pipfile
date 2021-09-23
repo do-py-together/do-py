@@ -12,11 +12,11 @@ test = "pytest -svo xfail_strict=True --durations 10 --maxfail 10 --cov ./ --cov
 do-py = { editable = true, path = "." }
 
 [dev-packages]
-pytest = "==4.6.0"
-pytest-cov = "==2.5.1"
-pytest-forked = "==0.2"
-pytest-timeout = "==1.3.3"
-pytest-xdist = "==1.20.1"
+pytest = "==4.6.11"
+pytest-cov = "==2.10.1"
+pytest-forked = "==1.3.0"
+pytest-timeout = "==1.4.2"
+pytest-xdist = "==1.34.0"
 coverage = "==4.5.1"
 twine = "==1.15"
 ipython = "==5.8.0"
