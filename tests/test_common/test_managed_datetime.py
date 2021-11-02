@@ -101,7 +101,7 @@ class TestMgdDatetime(object):
         (test_dt_instance_now.isoformat(), test_dt_instance_now),
         pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(test_date_instance_now.isoformat(), test_dt_instance_now,
-                     marks=pytest.mark.xfail(raises=ValueError)),
+                     marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError))
         ])
     def test_datetime(self, input, output):
@@ -118,7 +118,7 @@ class TestMgdDatetime(object):
         (test_dt_instance_now.isoformat(), test_dt_instance_now),
         pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(test_date_instance_now.isoformat(), test_dt_instance_now,
-                     marks=pytest.mark.xfail(raises=ValueError)),
+                     marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(None, None)
         ])
     def test_null_datetime(self, input, output):
@@ -135,7 +135,7 @@ class TestMgdDatetime(object):
         (test_date_instance_now.isoformat(), test_date_instance_now),
         pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(test_dt_instance_now.isoformat(), test_date_instance_now,
-                     marks=pytest.mark.xfail(raises=ValueError)),
+                     marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError))
         ])
     def test_date(self, input, output):
@@ -152,7 +152,7 @@ class TestMgdDatetime(object):
         (test_date_instance_now.isoformat(), test_date_instance_now),
         pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
         pytest.param(test_dt_instance_now.isoformat(), test_date_instance_now,
-                     marks=pytest.mark.xfail(raises=ValueError)),
+                     marks=pytest.mark.xfail(raises=RestrictionError)),
         (None, None)
         ])
     def test_null_date(self, input, output):

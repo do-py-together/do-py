@@ -7,6 +7,7 @@ from datetime import date, datetime
 
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
+from do_py.exceptions import RestrictionError
 
 
 class MgdDatetime(ManagedRestrictions):
@@ -71,7 +72,10 @@ class MgdDatetime(ManagedRestrictions):
             if self.default_key:
                 self.data = self.defaults[self.default_key](self.dt_obj)
         elif type(self.data) not in [datetime, date]:
-            self.data = datetime.strptime(self.data, self._parse_dt_fmt[self.dt_obj])
+            try:
+                self.data = datetime.strptime(self.data, self._parse_dt_fmt[self.dt_obj])
+            except ValueError:
+                raise RestrictionError.bad_data(self.data, self.dt_obj)
             if self.dt_obj is date:
                 self.data = self.data.date()
 
