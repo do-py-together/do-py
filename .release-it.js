@@ -1,6 +1,7 @@
 module.exports = {
     hooks: {
-        'before:init': 'git fetch --prune --prune-tags origin'
+        'before:init': 'git fetch --prune --prune-tags origin',
+        'after:release': 'yarn clean && yarn build && pipenv run twine upload dist/* && yarn clean'
     },
     git: {
         tagName: 'v${version}',
