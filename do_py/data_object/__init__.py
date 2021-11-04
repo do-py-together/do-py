@@ -156,6 +156,7 @@ class DataObject(RestrictedDictMixin):
     def schema(cls):
         """
         Schema of data object is its key structure based on restrictions. Nested data objects are also supported.
+        Note: DynamicRestrictions are not supported
         :return: schema
         :rtype: dict
         """
@@ -167,7 +168,7 @@ class DataObject(RestrictedDictMixin):
                 elif type(v) is tuple and type(v[0]) is ABCRestrictionMeta:
                     s[k] = v[0].schema
                 else:
-                    s[k] = None
+                    s[k] = v.schema_value
             cls._schema = s
         return cls._schema
 

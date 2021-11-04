@@ -70,6 +70,15 @@ class AbstractRestriction(tuple):
     def default(self):
         return self._default
 
+    @property
+    def schema_value(self):
+        """
+        Provide a string representation of valid values.
+        Useful for generating API-like documentation
+        :rtype: str or dict or list
+        """
+        raise NotImplementedError('schema value is not defined.')
+
     # NOTE:
     # Opportunity 1: ES restriction building capability can be triggered from es_ables.
     # Opportunity 2: The encoder system can be abstracted to support multiple encoding needs (including custom).
@@ -157,6 +166,15 @@ class SingletonRestriction(AbstractRestriction):
             return cls._cache[hashable]
 
     @property
+    def schema_value(self):
+        """
+        Provide a string representation of valid values.
+        Useful for generating API-like documentation
+        :rtype: str or dict or list
+        """
+        raise NotImplementedError('schema value is not defined.')
+
+    @property
     def es_restrictions(self):
         raise NotImplementedError('ES restrictions not defined.')
 
@@ -203,6 +221,16 @@ class _ListTypeRestriction(SingletonRestriction):
         if type(data) not in self._allowed:
             raise RestrictionError.bad_data(type(data), self._allowed)
         return data
+
+    @property
+    def schema_value(self):
+        """
+        :rtype: str
+        """
+        return ' or '.join({
+            x.__name__ for x in self.allowed
+            if x.__name__ not in ['newstr', 'newint', 'long']  # Exclude Py2/3 compatibility
+        })
 
     @property
     def es_restrictions(self):
@@ -254,6 +282,13 @@ class _ListValueRestriction(SingletonRestriction):
         return data
 
     @property
+    def schema_value(self):
+        """
+        :rtype: str
+        """
+        return ' or '.join({'"%s"' % x for x in self.allowed})
+
+    @property
     def es_restrictions(self):
         return ESEncoder.default('keyword')
 
@@ -296,6 +331,13 @@ class _ListNoRestriction(SingletonRestriction):
 
     def __call__(self, data, **kwargs):
         return data
+
+    @property
+    def schema_value(self):
+        """
+        :rtype: str
+        """
+        return 'any'
 
     @property
     def es_restrictions(self):
@@ -342,6 +384,14 @@ class _MgdRestRestriction(AbstractRestriction):
 
     def __call__(self, data, **kwargs):
         return self._allowed(data)
+
+    # TODO: This needs more finesse - support ManagedList
+    @property
+    def schema_value(self):
+        """
+        :rtype: str
+        """
+        return self.allowed.schema_value
 
     @property
     def es_restrictions(self):
@@ -394,6 +444,13 @@ class _NullableDataObjectRestriction(SingletonRestriction):
     @property
     def dataobj(self):
         return self.allowed
+
+    @property
+    def schema_value(self):
+        """
+        :rtype: dict
+        """
+        return self.dataobj.schema
 
     @property
     def es_restrictions(self):
@@ -593,6 +650,13 @@ class ManagedRestrictions(object, with_metaclass(ABCMeta)):
         Expose restriction default.
         """
         return self._restriction.default
+
+    @property
+    def schema_value(self):
+        """
+        :rtype: str or dict or list
+        """
+        return self._restriction.schema_value
 
     def __call__(self, value, strict=True):
         """

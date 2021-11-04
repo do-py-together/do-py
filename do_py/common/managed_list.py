@@ -12,6 +12,13 @@ class ManagedList(ManagedRestrictions):
     """
     _restriction = R(list, type(None))
 
+    @property
+    def schema_value(self):
+        """
+        :rtype: list[dict]
+        """
+        return [self.obj_cls.schema]
+
     def __init__(self, obj_cls, nullable=False):
         """
         :param obj_cls: The DO to check each value in the list against.
