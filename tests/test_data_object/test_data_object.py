@@ -449,6 +449,7 @@ class TestDataObject(object):
         inst = A.create(id=id, name=name, status=status)
         for k in A._restrictions:
             assert k in dir(inst)
+        assert 'create' in dir(inst)
 
     def test_schema(self):
         schema = A.schema

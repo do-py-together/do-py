@@ -86,7 +86,8 @@ class RestrictedDictMixin(dict):
             raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, item))
 
     def __dir__(self):
-        dict_dir = dir(dict)
+        dict_dir = dir(type(self))
         for x in ['clear', 'pop', 'popitem', 'update', '__delitem__']:
-            dict_dir.remove(x)
+            if x in dict_dir:
+                dict_dir.remove(x)
         return dict_dir
