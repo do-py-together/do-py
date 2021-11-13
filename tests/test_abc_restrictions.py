@@ -82,6 +82,16 @@ class TestABCRestrictions(object):
         except Exception:
             assert True
 
+        # Metaclass ambiguity
+        try:
+            _cls = MyMeta('AdditionSubBad', (), namespace)
+            ABCRestrictions.require('x')(_cls)
+            raise MyTestException('Metaclass ambiguity should have thrown error.')
+        except MyTestException as e:
+            assert False, str(e)
+        except Exception:
+            assert True
+
         # Teardown  # TODO: Support teardown on test failure too
         for cls in teardown_classes:
             if cls in ABCRestrictionMeta._abc_classes:

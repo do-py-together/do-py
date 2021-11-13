@@ -184,6 +184,18 @@ class ABCRestrictions(object):
                     u = already_declared(abc_cls, ConstABCR.unique, unique)
                     assert not u, SystemMessages.ATTRIBUTE_ALREADY_DECLARED % ('Unique', u, abc_cls.__name__)
                 namespace[ConstABCR.unique] = tuple(unique) + getattr(cls_ref, ConstABCR.unique, ())
-            return ABCRestrictionMeta(cls_ref.__name__, cls_ref.__bases__, namespace)
+
+            # Create class with ABCRestrictionMeta by default, or use children of ABCRestrictionMeta
+            cls_type = type(cls_ref)
+            if cls_type is type:
+                meta = ABCRestrictionMeta
+            elif isinstance(cls_ref, ABCRestrictionMeta):
+                meta = cls_type
+            else:
+                raise Exception(
+                    'Metaclass ambiguity. Cannot use `ABCRestrictions.require` with %s.' % cls_type.__name__
+                    )
+
+            return meta(cls_ref.__name__, cls_ref.__bases__, namespace)
 
         return worker
