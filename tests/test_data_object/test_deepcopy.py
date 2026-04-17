@@ -3,7 +3,6 @@
 """
 from copy import deepcopy
 
-from builtins import object
 
 from do_py import R
 from do_py.data_object import DataObject, Restriction

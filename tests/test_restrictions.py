@@ -4,12 +4,10 @@ Tests for restrictions.
 :author: AJ
 """
 
-from builtins import object
 from copy import deepcopy
-from future.types import newstr
-import pytest
 from datetime import date, datetime
-from future.utils import PY3
+
+import pytest
 
 from do_py import DataObject
 from do_py.common import R
@@ -118,7 +116,7 @@ class TestRestriction(object):
     @pytest.mark.parametrize('data', [
         None,
         'a',
-        newstr.newstr('b') if PY3 else newstr('b'),
+        str('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_null_str_values(self, data):
@@ -126,7 +124,7 @@ class TestRestriction(object):
 
     @pytest.mark.parametrize('data', [
         'a',
-        newstr.newstr('b') if PY3 else newstr('b'),
+        str('b'),
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
         pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])

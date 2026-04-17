@@ -4,7 +4,6 @@ Test managed restrictions.
 """
 import itertools as it
 import pytest
-from builtins import map, object, zip
 
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions

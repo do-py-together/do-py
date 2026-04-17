@@ -3,7 +3,6 @@ Test the property decorators and related utils.
 """
 import time
 
-from builtins import object
 
 from do_py.utils.properties import cached_classproperty, cached_property, classproperty, is_cached_property, \
     is_classmethod, is_property

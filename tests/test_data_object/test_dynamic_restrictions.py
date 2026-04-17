@@ -3,7 +3,6 @@ Test dynamic restriction class creation, inheritance and usage.
 :date_created: 2020-07-10
 """
 import pytest
-from builtins import object
 
 from do_py import DataObject, R
 from do_py.data_object.dynamic_restrictions import dynamic_restriction_mixin
