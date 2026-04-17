@@ -105,10 +105,12 @@ class AbstractRestriction(tuple):
     def __copy__(self):
         return tuple(self)
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
         """
         NOTE: `deepcopy` uses memoization to store a previously copied instance.
         """
+        if memodict is None:
+            memodict = {}
         _r = copy.deepcopy(self.__copy__())
         instance = self.__class__(_r[0], default=_r[1])
         memodict[id(self)] = instance

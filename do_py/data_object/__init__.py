@@ -140,7 +140,7 @@ class DataObject(RestrictedDictMixin):
         return dict(self)
 
     # TODO: Needs a test
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
         """
         Supports deep copying of DataObject. This gives user back plain old python dictionary.
         :param memodict:
@@ -148,6 +148,8 @@ class DataObject(RestrictedDictMixin):
         :return: python dictionary representation
         :rtype: dict
         """
+        if memodict is None:
+            memodict = {}
         # NOTE: this could be an alternative implementation
         # return self.__class__(data=dict(self))
         memodict[id(self)] = self.__copy__()
