@@ -28,9 +28,9 @@ class DataObject(RestrictedDictMixin):
         Matching _restrictions value:
         _restrictions = {
             'id': ([int], None),
-            'value': ([str, unicode], None),
-            'created': ([int, long], None),
-            'modified': ([int, long], None)
+            'value': ([str], None),
+            'created': ([int], None),
+            'modified': ([int], None)
             }
 
 

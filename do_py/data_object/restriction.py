@@ -4,15 +4,8 @@ Data Object Restrictions.
 """
 
 import copy
-import sys
 from abc import ABCMeta, abstractmethod, abstractproperty
-
-from builtins import object
 from datetime import date, datetime
-from future.moves import builtins
-from future.types import newint, newlist, newstr
-from future.utils import with_metaclass
-from past.builtins import long, unicode
 
 from ..abc import ABCRestrictionMeta
 from ..exceptions import RestrictionError
@@ -227,10 +220,7 @@ class _ListTypeRestriction(SingletonRestriction):
         """
         :rtype: str
         """
-        return ' or '.join({
-            x.__name__ for x in self.allowed
-            if x.__name__ not in ['newstr', 'newint', 'long']  # Exclude Py2/3 compatibility
-        })
+        return ' or '.join({x.__name__ for x in self.allowed})
 
     @property
     def es_restrictions(self):
@@ -521,7 +511,7 @@ class Restriction(object):
             raise RestrictionError.from_invalid_default_value(default)
         if isinstance(allowed, ManagedRestrictions):
             return _MgdRestRestriction(allowed, default=allowed.default, **kwargs)
-        elif type(allowed) in [list, newlist]:
+        elif type(allowed) is list:
             if len(allowed) == 0:
                 return _ListNoRestriction(allowed, default=default, **kwargs)
             elif len(allowed) == 2 and ABCRestrictionMeta in [type(e) for e in allowed]:
@@ -594,7 +584,7 @@ class Restriction(object):
             return cls(declaration)
 
 
-class ManagedRestrictions(object, with_metaclass(ABCMeta)):
+class ManagedRestrictions(object, metaclass=ABCMeta):
     """
     Useful for managing complex data validations for restrictions in DataObject. E.g.
     1. Regular expression validation such as review URL matches expected template.
@@ -733,27 +723,16 @@ class ESEncoder(object):
         """
         :rtype: dict
         """
-        encoding = {
+        return {
             int: ESR.INT,
-            long: ESR.INT,
-            builtins.int: ESR.INT,
             float: ESR.FLOAT,
-            builtins.float: ESR.FLOAT,
             datetime: ESR.DATE,
             date: ESR.DATE,
             bool: ESR.BOOL,
             str: ESR.STR,
-            builtins.str: ESR.STR,
-            unicode: ESR.STR,
             'keyword': ESR.KEYWORD,
             # list: {},
             }
-        if sys.version_info.major == 3:
-            encoding.update({
-                newint.newint: ESR.INT,
-                newstr.newstr: ESR.STR
-                })
-        return encoding
 
     @classmethod
     def default(cls, obj):
