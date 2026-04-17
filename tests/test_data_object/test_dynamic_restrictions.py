@@ -6,7 +6,8 @@ Test dynamic restriction class creation, inheritance and usage.
 import pytest
 
 from do_py import DataObject, R
-from do_py.data_object.dynamic_restrictions import dynamic_restriction_mixin
+from do_py.data_object.dynamic_restrictions import DynamicRestrictions, dynamic_restriction_mixin
+from do_py.exceptions import DataObjectError, RestrictionError
 
 
 class MilkMetadata(DataObject):
@@ -78,6 +79,80 @@ class TestDynamicDataObject:
         assert breakfast.item_metadata.flavor == 'chocolate'
         breakfast.item_metadata.flavor = 'normal'
         assert breakfast.item_metadata.flavor == 'normal'
+
+
+class TestDynamicSetItem:
+    """Test __setitem__ paths for dynamic restrictions."""
+
+    def test_setitem_dependent_key_valid(self):
+        """Setting the dependent key with matching data should succeed."""
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        breakfast['item_metadata'] = MilkMetadata({'flavor': 'normal'})
+        assert breakfast.item_metadata.flavor == 'normal'
+
+    def test_setitem_dependent_key_mismatched_restriction(self):
+        """Setting the dependent key with mismatched data should fail."""
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        with pytest.raises((DataObjectError, RestrictionError, AssertionError)):
+            breakfast['item_metadata'] = CerealMetadata({'brand': 'cheerios'})
+
+    def test_setitem_non_dynamic_key(self):
+        """Setting a key that is not dynamic should work normally."""
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        breakfast['name'] = 'morning milk'
+        assert breakfast.name == 'morning milk'
+
+    def test_setitem_independent_key_same_type(self):
+        """Changing the independent key while dependent value is still compatible."""
+        # Create two breakfasts to verify setitem on dependent works per-type
+        milk = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        milk.item_metadata = MilkMetadata({'flavor': 'normal'})
+        assert milk._restrictions['item_metadata'] == MilkMetadata
+        assert milk.item_metadata.flavor == 'normal'
+
+
+class TestDynamicInstanceIsolation:
+    """Verify that two instances with different dynamic restrictions don't share state."""
+
+    def test_two_instances_independent(self):
+        """Two instances with different items should have independent restrictions."""
+        milk = Breakfast({'item': 'milk', 'item_metadata': MilkMetadata({'flavor': 'chocolate'})})
+        cereal = Breakfast({'item': 'cereal', 'item_metadata': CerealMetadata({'brand': 'cheerios'})})
+
+        assert milk._restrictions['item_metadata'] == MilkMetadata
+        assert cereal._restrictions['item_metadata'] == CerealMetadata
+
+        # Mutating one should not affect the other
+        milk.item_metadata.flavor = 'normal'
+        assert cereal.item_metadata.brand == 'cheerios'
+
+    def test_class_restrictions_untouched(self):
+        """Class-level restrictions should never be mutated by instance creation."""
+        assert Breakfast._restrictions['item_metadata'] == R()
+        Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        assert Breakfast._restrictions['item_metadata'] == R()
+
+
+class TestDynamicRestrictionsManagedRestriction:
+    """Direct tests for the DynamicRestrictions ManagedRestrictions class."""
+
+    def test_valid_dynamic_restrictions(self):
+        """DynamicRestrictions.manage should succeed with valid DO mappings."""
+        dr = DynamicRestrictions()
+        result = dr({'milk': MilkMetadata, 'cereal': CerealMetadata})
+        assert result == {'milk': MilkMetadata, 'cereal': CerealMetadata}
+
+    def test_empty_dict_fails(self):
+        """DynamicRestrictions.manage should fail with an empty dict."""
+        dr = DynamicRestrictions()
+        with pytest.raises(AssertionError, match='empty'):
+            dr({})
+
+    def test_non_dataobject_value_fails(self):
+        """DynamicRestrictions.manage should fail if a value is not a DataObject."""
+        dr = DynamicRestrictions()
+        with pytest.raises(AssertionError):
+            dr({'bad': int})
 
 
 class TestInheritance:

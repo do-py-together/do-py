@@ -77,8 +77,6 @@ class TestMgdDatetime:
         [
             (test_dt_instance_now, test_dt_instance_now),
             (test_dt_instance_now.isoformat(), test_dt_instance_now),
-            # This creates race condition.
-            # pytest.param(None, test_dt_instance_now, marks=pytest.mark.xfail(raises=RestrictionError))
         ],
     )
     def test_to_datetime(self, input, output):
@@ -197,3 +195,86 @@ class TestMgdDatetime:
         """
         instance = MgdDatetime.null_date()
         assert instance(input) == output
+
+
+class TestMgdDatetimeMalformedStrings:
+    """Test that malformed ISO strings raise RestrictionError via the manage() path."""
+
+    @pytest.mark.parametrize(
+        'bad_input',
+        [
+            'not-a-date',
+            '2020-13-45',
+            '2020/01/01',
+            'hello world',
+            '12345',
+            '',
+        ],
+    )
+    def test_malformed_datetime_string(self, bad_input):
+        """Malformed string should raise RestrictionError from strptime ValueError."""
+        instance = MgdDatetime.datetime()
+        with pytest.raises(RestrictionError):
+            instance(bad_input)
+
+    @pytest.mark.parametrize(
+        'bad_input',
+        [
+            'not-a-date',
+            '2020-13-45',
+            '2020/01/01',
+            '',
+        ],
+    )
+    def test_malformed_date_string(self, bad_input):
+        """Malformed date string should raise RestrictionError."""
+        instance = MgdDatetime.date()
+        with pytest.raises(RestrictionError):
+            instance(bad_input)
+
+
+class TestMgdDatetimeDefaultKeyNone:
+    """Test behavior when default_key is None and data is None."""
+
+    def test_datetime_no_default_none_input(self):
+        """With no default_key and non-nullable, None should fail restriction."""
+        instance = MgdDatetime(dt_obj=datetime, default_key=None, nullable=False)
+        with pytest.raises(RestrictionError):
+            instance(None)
+
+    def test_datetime_no_default_nullable_none_input(self):
+        """With no default_key but nullable, None should pass through."""
+        instance = MgdDatetime(dt_obj=datetime, default_key=None, nullable=True)
+        result = instance(None)
+        assert result is None
+
+    def test_date_no_default_nullable_none_input(self):
+        """With no default_key but nullable date, None should pass through."""
+        instance = MgdDatetime(dt_obj=date, default_key=None, nullable=True)
+        result = instance(None)
+        assert result is None
+
+
+class TestMgdDatetimeInvalidInit:
+    """Test that invalid constructor args are rejected."""
+
+    def test_invalid_dt_obj(self):
+        """dt_obj must be date or datetime."""
+        with pytest.raises(AssertionError):
+            MgdDatetime(dt_obj=str)
+
+    def test_invalid_default_key(self):
+        """default_key must be None, 'from', or 'to'."""
+        with pytest.raises(AssertionError):
+            MgdDatetime(dt_obj=datetime, default_key='invalid')
+
+
+class TestMgdDatetimeMicrosecondStripping:
+    """Verify that microseconds are stripped for datetime results."""
+
+    def test_microseconds_stripped(self):
+        """datetime results should have microsecond=0."""
+        dt_with_micro = datetime(2020, 1, 1, 12, 0, 0, 123456)
+        instance = MgdDatetime.datetime()
+        result = instance(dt_with_micro)
+        assert result.microsecond == 0
