@@ -82,8 +82,8 @@ class RestrictedDictMixin(dict):
         """
         try:
             return self[item]
-        except KeyError:
-            raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, item))
+        except KeyError as e:
+            raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, item)) from e
 
     def __dir__(self):
         dict_dir = dir(type(self))

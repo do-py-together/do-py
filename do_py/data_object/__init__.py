@@ -51,7 +51,7 @@ class DataObject(RestrictedDictMixin):
             try:
                 cls._restrictions[k] = Restriction.legacy(cls._restrictions[k])
             except RestrictionError as e:
-                raise DataObjectError.from_restriction_error(k, cls, e)
+                raise DataObjectError.from_restriction_error(k, cls, e) from e
 
     @classmethod
     def _validate_data(cls, _restrictions, d, strict=True):
@@ -98,7 +98,7 @@ class DataObject(RestrictedDictMixin):
                 try:
                     _dict[k] = v(d[k], strict=strict)
                 except RestrictionError as e:
-                    raise DataObjectError.from_restriction_error(k, cls, e)
+                    raise DataObjectError.from_restriction_error(k, cls, e) from e
 
         return _dict
 

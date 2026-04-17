@@ -74,8 +74,8 @@ class MgdDatetime(ManagedRestrictions):
         elif type(self.data) not in [datetime, date]:
             try:
                 self.data = datetime.strptime(self.data, self._parse_dt_fmt[self.dt_obj])
-            except ValueError:
-                raise RestrictionError.bad_data(self.data, self.dt_obj)
+            except ValueError as e:
+                raise RestrictionError.bad_data(self.data, self.dt_obj) from e
             if self.dt_obj is date:
                 self.data = self.data.date()
 

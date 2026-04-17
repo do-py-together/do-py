@@ -151,8 +151,8 @@ class SingletonRestriction(AbstractRestriction):
                 hashable = (cls.__name__, restriction_tuple[0])
             else:
                 hashable = (cls.__name__, frozenset(restriction_tuple[0]), rt1)
-        except TypeError:
-            raise RestrictionError.from_unhashable(restriction_tuple[0], restriction_tuple[1])
+        except TypeError as e:
+            raise RestrictionError.from_unhashable(restriction_tuple[0], restriction_tuple[1]) from e
 
         if hashable in cls._cache:
             return cls._cache[hashable]
@@ -740,5 +740,5 @@ class ESEncoder:
     def default(cls, obj):
         try:
             return cls.encoding[obj]
-        except KeyError:
-            raise RestrictionError('%s cannot be encoded!' % obj)
+        except KeyError as e:
+            raise RestrictionError('%s cannot be encoded!' % obj) from e
