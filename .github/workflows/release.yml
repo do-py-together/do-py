@@ -17,8 +17,18 @@
 name: release
 
 on:
+  # Primary trigger: a GitHub Release is published. The UI flow
+  # (Releases -> Draft a new release -> Publish) fires this.
   release:
     types: [published]
+  # Escape hatch for when the release event doesn't fire for some reason,
+  # or for re-publishing after an aborted run. Takes a tag to build from.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build and publish (e.g. v1.0.0)'
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -34,8 +44,20 @@ jobs:
       # Required for OIDC trusted publishing. No other permissions needed.
       id-token: write
     steps:
+      - name: Resolve target tag
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="${{ github.event.release.tag_name }}"
+          else
+            tag="${{ inputs.tag }}"
+          fi
+          echo "Target tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - name: Check out the tagged commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.tag }}
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -43,12 +65,13 @@ jobs:
           python-version: '3.12'
       - name: Verify tag matches pyproject.toml version
         run: |
-          tag="${GITHUB_REF_NAME#v}"
+          tag="${{ steps.resolve.outputs.tag }}"
+          tag_ver="${tag#v}"
           pyver=$(uv run --no-project python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
-          echo "Git tag version:     $tag"
+          echo "Git tag version:     $tag_ver"
           echo "pyproject.toml ver:  $pyver"
-          if [ "$tag" != "$pyver" ]; then
-            echo "::error::Tag '$GITHUB_REF_NAME' does not match pyproject.toml version '$pyver'"
+          if [ "$tag_ver" != "$pyver" ]; then
+            echo "::error::Tag '$tag' does not match pyproject.toml version '$pyver'"
             exit 1
           fi
       - name: Build sdist and wheel
