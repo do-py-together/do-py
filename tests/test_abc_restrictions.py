@@ -7,9 +7,21 @@ import pytest
 from do_py.abc import ABCRestrictionMeta, ABCRestrictions
 from do_py.abc.constants import ConstABCR
 
-from .data import MyTestException
+
+@pytest.fixture()
+def _abc_cleanup():
+    """
+    Snapshot and restore ABCRestrictionMeta global state so that test-created
+    classes never leak into other tests.
+    """
+    original_classes = set(ABCRestrictionMeta._abc_classes)
+    original_uniques = {k: list(v) for k, v in ABCRestrictionMeta._unique_attrs.items()}
+    yield
+    ABCRestrictionMeta._abc_classes = original_classes
+    ABCRestrictionMeta._unique_attrs = {k: list(v) for k, v in original_uniques.items()}
 
 
+@pytest.mark.usefixtures('_abc_cleanup')
 class TestABCRestrictions:
     @pytest.mark.parametrize('def_new', [False, True])
     def test_require_decorator(self, def_new):
@@ -19,8 +31,6 @@ class TestABCRestrictions:
         class MyMeta(type):
             pass
 
-        teardown_classes = []  # Append to this everytime we ".require" decorate a class
-
         namespace = {'__module__': __name__}
         if def_new:
             namespace['__new__'] = classmethod(__new__)
@@ -28,81 +38,46 @@ class TestABCRestrictions:
         namespace[ConstABCR.is_abstract] = True
 
         RestrictedOk = ABCRestrictions.require('x')(type('RestrictedOk', tuple(), namespace))
-        teardown_classes.append(RestrictedOk)
-        assert RestrictedOk
+        assert RestrictedOk, 'ABCRestrictions.require failed to return a class'
         assert type(RestrictedOk) is ABCRestrictionMeta, 'Failed to apply ABCRestrictionMeta'
         assert RestrictedOk in ABCRestrictionMeta.abc_classes
-        try:
+
+        # Leaf without required attribute must fail
+        with pytest.raises(AssertionError):
             type('InvalidSubOk', (RestrictedOk,), {})
-            raise Exception('Compile time validation failed!')
-        except AssertionError:
-            assert True
+
         SubOk = type('SubOk', (RestrictedOk,), {'x': 1, '__module__': __name__})
-        assert SubOk
+        assert SubOk, 'Leaf class creation failed'
         assert SubOk.x == 1
 
         MiddleLayerOk = type('MiddleLayerOk', (RestrictedOk,), {ConstABCR.is_abstract: True, '__module__': __name__})
-        assert MiddleLayerOk
+        assert MiddleLayerOk, 'Node class creation failed'
         assert 'x' not in MiddleLayerOk.__dict__
 
-        # Additional and unique requirements
-        try:
+        # Re-requiring on a reserved namespace must fail
+        with pytest.raises(AssertionError):
             ABCRestrictions.require('x')(MiddleLayerOk)
-            raise MyTestException('Able to re-require a reserved namespace!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
         UniqueOk = ABCRestrictions.require('y', unique=['y'])(MiddleLayerOk)
-        teardown_classes.append(UniqueOk)
         UniqueSubOk = type('AdditionalSubOk', (UniqueOk,), {'x': 1, 'y': 2, '__module__': __name__})
-        teardown_classes.append(UniqueSubOk)
-        assert UniqueSubOk
+        assert UniqueSubOk, 'Leaf with additional unique attr failed'
         assert UniqueSubOk.x == 1
         assert UniqueSubOk.y == 2
 
-        try:
+        # Duplicate unique value must fail
+        with pytest.raises(AssertionError):
             type('AdditionalSubOk2', (UniqueOk,), {'x': 1, 'y': 2, '__module__': __name__})
-            raise MyTestException('Value check on unique attribute failed!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
-        # Reserved unique attribute namespace
-        try:
+        # Reserved unique attribute namespace must fail
+        with pytest.raises(AssertionError):
             ABCRestrictions.require('y', unique=['y'])(MiddleLayerOk)
-            raise MyTestException('Able to require uniqueness on a reserved namespace!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
-        # Metaclass ambiguity
-        try:
+        # Metaclass ambiguity must fail
+        with pytest.raises(Exception, match='[Mm]etaclass'):
             _cls = MyMeta('AdditionSubBad', (), namespace)
             ABCRestrictions.require('x')(_cls)
-            raise MyTestException('Metaclass ambiguity should have thrown error.')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
-
-        # Teardown  # TODO: Support teardown on test failure too
-        for cls in teardown_classes:
-            if cls in ABCRestrictionMeta._abc_classes:
-                ABCRestrictionMeta._abc_classes.remove(cls)
-            for a in ABCRestrictionMeta._unique_attrs:
-                if cls in ABCRestrictionMeta._unique_attrs[a]:
-                    ABCRestrictionMeta._unique_attrs[a].remove(cls)
 
     @pytest.mark.parametrize('parent_class', sorted(ABCRestrictionMeta.abc_classes.keys(), key=lambda x: x.__name__))
     def test_not_instantiable(self, parent_class):
-        try:
+        with pytest.raises(NotImplementedError):
             parent_class()
-            assert False
-        except NotImplementedError:
-            assert True
-        except Exception:
-            assert False

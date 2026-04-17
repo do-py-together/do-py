@@ -11,15 +11,13 @@ from do_py import DataObject
 from do_py.common import R
 from do_py.exceptions import DataObjectError, RestrictionError
 
-from ..data import A, MyTestException, data, keys, short_data
+from ..data import A, data, keys, short_data
 
 
 def our_hasattr(instance, name):
     """
-
-    :param instance:
-    :param name:
-    :return:
+    Check if *name* lives in the instance's own ``__dict__`` (not in the
+    class or its MRO).
     """
     return name in instance.__dict__
 
@@ -28,28 +26,23 @@ class TestDataObject:
     @pytest.mark.parametrize('id, name, status', data)
     def test_init(self, id, name, status):
         a = A.create(id=id, name=name, status=status)
-        assert a
+        assert a, 'A.create returned a falsy value'
         assert a.id == id
         assert a.name == name
         assert a.status == status
         assert a['id'] == id
         assert a['name'] == name
         assert a['status'] == status
-        assert a(data=a)
+        assert a(data=a), '__call__ re-init failed'
 
     def test_class_namespace(self):
-        try:
+        with pytest.raises(AttributeError):
 
             class B(DataObject):
                 _restrictions = {'x': R.INT.with_default(1)}
                 x = None
 
             B(data={'x': 1})
-            raise Exception('Failed to protect namespace clash between _restrictions and cls.x!')
-        except AttributeError:
-            assert True
-        except Exception as e:
-            assert False, str(e)
 
     @pytest.mark.parametrize(
         'deep',
@@ -114,7 +107,7 @@ class TestDataObject:
         if not d:
             data_ = None
         b = B(data=data_, strict=strict)
-        assert b
+        assert b, 'B() returned a falsy value'
 
     def test_nested_restrictions(self):
         class B(DataObject):
@@ -135,21 +128,13 @@ class TestDataObject:
         assert type(c.b) is B
         assert c.b.x
 
-        # Test nested validation
-        try:
+        # Test nested validation — invalid value for a restricted key
+        with pytest.raises((RestrictionError, DataObjectError)):
             c.b.x = 'invalid'
-            raise MyTestException('Invalid value assigned to c.b.x!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
-        try:
+
+        # Test nested validation — invalid data dict
+        with pytest.raises(DataObjectError):
             c.b = {'invalid': 'values'}
-            raise MyTestException('Invalid data dict assigned to c.b!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
         # Test default value behavior
         c_default = C(strict=False)
@@ -158,7 +143,7 @@ class TestDataObject:
         assert type(c_default.a) is A
         assert type(c_default.b) is B
         for k, v in c_default.a.items():
-            assert v is None, [(k, v) for k, v in c_default.a.items()]
+            assert v is None, 'Expected None for key %r, got %r' % (k, v)
 
     @pytest.mark.parametrize('restrictions', [pytest.param(R(A, type(None)), id='([A, type(None)], None)'), A])
     def test_supported_nested_restrictions_format(self, restrictions):
@@ -189,30 +174,20 @@ class TestDataObject:
         assert b
 
     def test_missing_restrictions(self):
-        try:
+        with pytest.raises(AssertionError):
 
             class B(DataObject):
                 pass
 
             B()
-            raise MyTestException('Error should have thrown.')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
     def test_nesting_dict_restrictions(self):
-        try:
+        with pytest.raises(DataObjectError):
 
             class B(DataObject):
                 _restrictions = {'a': {'x': [], 'y': []}}
 
             B(data={'a': {'x': 1, 'y': 2}})
-            raise MyTestException('Error should have thrown.')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
     @pytest.mark.parametrize('id, name, status', short_data)
     def test_setitem(self, id, name, status):
@@ -228,26 +203,18 @@ class TestDataObject:
         assert a['id'] == newer_id
         assert a.id == newer_id
 
-        try:
+        # Assigning to an unrestricted key via item access must fail
+        with pytest.raises(KeyError):
             a['invalid'] = 'something'
-            raise MyTestException('Able to assign a value to an unrestricted key!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
         # Attribute space can be freeform, but will not become part of restricted data schema
         a.invalid = 'something'
         assert our_hasattr(a, 'invalid'), 'Attribute not found'
         assert 'invalid' not in a
         assert a.invalid == 'something'
-        try:
+
+        with pytest.raises(KeyError):
             _ = a['invalid']
-            raise MyTestException('Able to pull out value set in attribute namespace from keyspace!')
-        except MyTestException as e:
-            assert False, str(e)
-        except Exception:
-            assert True
 
     @pytest.mark.parametrize('id, name, status', short_data)
     def test_get(self, id, name, status):
@@ -255,16 +222,12 @@ class TestDataObject:
         assert a.get('id') == a.id == id
         assert a.get('name') == a.name == name
         assert a.get('status') == a.status == status
-        try:
+
+        with pytest.raises(KeyError):
             _ = a['nope']
-            assert False
-        except KeyError:
-            assert True
-        try:
+
+        with pytest.raises(AttributeError):
             _ = a.nope
-            assert False
-        except AttributeError:
-            assert True
 
     @pytest.mark.parametrize('id, name, status', short_data)
     @pytest.mark.parametrize('key', keys)
@@ -275,35 +238,21 @@ class TestDataObject:
     @pytest.mark.parametrize('id, name, status', short_data)
     def test_clear_pop(self, id, name, status):
         a = A.create(id=id, name=name, status=status)
-        try:
+
+        with pytest.raises(TypeError):
             a.clear()
-            assert False
-        except TypeError:
-            assert True
 
-        try:
+        with pytest.raises(TypeError):
             a.pop('id')
-            assert False
-        except TypeError:
-            assert True
 
-        try:
+        with pytest.raises(TypeError):
             a.popitem()
-            assert False
-        except TypeError:
-            assert True
 
-        try:
+        with pytest.raises(TypeError):
             del a['id']
-            assert False
-        except TypeError:
-            assert True
 
-        try:
+        with pytest.raises(TypeError):
             a.update({'id': 1})
-            assert False
-        except TypeError:
-            assert True
 
     @pytest.mark.parametrize('complex', [pytest.param(True, marks=pytest.mark.xfail), False])
     def test_str_repr(self, complex):
@@ -317,9 +266,9 @@ class TestDataObject:
 
         a = B(data={'datetime': datetime.now(), 'date': date.today(), 'default': MyObj if complex else 'hello world'})
         # __repr__ returns JSON
-        assert json.loads('%r' % a)
+        assert json.loads('%r' % a), '__repr__ did not produce valid JSON'
         # __str__ returns string
-        assert '%s' % a
+        assert '%s' % a, '__str__ produced empty string'
 
     @pytest.mark.parametrize(
         'd, strict',
@@ -349,9 +298,7 @@ class TestDataObject:
     @pytest.mark.parametrize('id, name, status', short_data)
     def test_attr_restr_mutually_exclusive(self, id, name, status):
         """
-        Restriction keys should not be present in attr space. Not key attributes should live in attribute space.
-        :return:
-        :rtype:
+        Restriction keys should not be present in attr space. Non-key attributes should live in attribute space.
         """
         a = A.create(id=id, name=name, status=status)
         assert not any([our_hasattr(a, e) for e in A._restrictions.keys()])
@@ -369,20 +316,17 @@ class TestDataObject:
         class Second(DataObject):
             _restrictions = {'id': R.INT}
 
-        try:
+        with pytest.raises(DataObjectError):
             type('Mixed', (DataObject,), {'_restrictions': {'id': [First, Second]}, '__module__': 'pytest'})
-            raise MyTestException('Mixed Data Objects should not be allowed in restrictions')
-        except DataObjectError:
-            assert True
 
     @pytest.mark.parametrize('id, name, status', short_data)
     def test_dir(self, id, name, status):
         inst = A.create(id=id, name=name, status=status)
         for k in A._restrictions:
-            assert k in dir(inst)
-        assert 'create' in dir(inst)
+            assert k in dir(inst), 'Restriction key %r missing from dir()' % k
+        assert 'create' in dir(inst), 'classmethod "create" missing from dir()'
 
     def test_schema(self):
         schema = A.schema
         for k in A._restrictions:
-            assert k in schema
+            assert k in schema, 'Key %r missing from schema' % k
