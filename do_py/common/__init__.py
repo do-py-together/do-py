@@ -2,6 +2,7 @@
 Commonly used restrictions.
 :date_created: 2020-06-28
 """
+
 from datetime import date, datetime
 
 from do_py.data_object import Restriction

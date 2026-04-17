@@ -1,6 +1,7 @@
 """
 Test the property decorators and related utils.
 """
+
 import time
 
 from do_py.utils.properties import (
@@ -17,6 +18,7 @@ class ATest:
     """
     Dummy class for testing `is_classmethod` and `is_property`.
     """
+
     CLS_VALUE = 'hello world'
 
     @classproperty

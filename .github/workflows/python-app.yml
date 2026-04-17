@@ -25,6 +25,8 @@ jobs:
         run: uv sync --group dev
       - name: Lint with ruff
         run: uv run ruff check do_py tests
+      - name: Check formatting with ruff
+        run: uv run ruff format --check do_py tests
       - name: Run unit tests
         run: |
           uv run pytest \

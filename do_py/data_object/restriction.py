@@ -29,6 +29,7 @@ class AbstractRestriction(tuple):
     default:
     Every restriction provides a default value. If not explicitly specified, it is implicitly set to None.
     """
+
     _default = None
     _allowed = None
 
@@ -126,6 +127,7 @@ class SingletonRestriction(AbstractRestriction):
     This is an interface for Restriction type to use singleton structure. The objective is to use pre-defined
     restrictions and reduce the memory footprint of DataObject declarations.
     """
+
     _cache = {}
 
     def __new__(cls, restriction_tuple):
@@ -449,11 +451,7 @@ class _NullableDataObjectRestriction(SingletonRestriction):
         if hasattr(self.dataobj, 'es_restrictions'):
             return self.dataobj.es_restrictions
         else:
-            return {
-                'properties': {
-                    k: v.es_restrictions for k, v in self.dataobj._restrictions.items()
-                    }
-                }
+            return {'properties': {k: v.es_restrictions for k, v in self.dataobj._restrictions.items()}}
 
 
 class _DataObjectRestriction(_NullableDataObjectRestriction):
@@ -616,6 +614,7 @@ class ManagedRestrictions(metaclass=ABCMeta):
 
     :attribute manage: users must implement validation/standardization logic in manage
     """
+
     data = None
 
     def __new__(cls, *args, **kwargs):
@@ -678,6 +677,7 @@ class ESR:
     """
     Constants class housing the different types of ES restrictions.
     """
+
     INT = {'type': 'integer'}
     FLOAT = {'type': 'float'}
     DATE = {'type': 'date'}
@@ -694,10 +694,7 @@ class ESR:
         """
         if not hasattr(nested_data_object, 'es_restrictions'):
             raise RestrictionError.bad_data(nested_data_object, 'DataObject')
-        return {
-            'type': 'object',
-            'properties': nested_data_object.es_restrictions
-            }
+        return {'type': 'object', 'properties': nested_data_object.es_restrictions}
 
     @staticmethod
     def NESTED(nested_data_object):
@@ -708,10 +705,7 @@ class ESR:
         """
         if not hasattr(nested_data_object, 'es_restrictions'):
             raise RestrictionError.bad_data(nested_data_object, 'DataObject')
-        return {
-            'type': 'nested',
-            'properties': nested_data_object.es_restrictions
-            }
+        return {'type': 'nested', 'properties': nested_data_object.es_restrictions}
 
 
 class ESEncoder:
@@ -734,7 +728,7 @@ class ESEncoder:
             str: ESR.STR,
             'keyword': ESR.KEYWORD,
             # list: {},
-            }
+        }
 
     @classmethod
     def default(cls, obj):

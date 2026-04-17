@@ -4,6 +4,7 @@ System messages to directly support error messages in base_model modules.
 :author: Tim Davis
 """
 
+
 class SystemMessages:
     REQUIRED_FOR = '%s is required for %s!'
     GENERIC = 'Unknown error.'

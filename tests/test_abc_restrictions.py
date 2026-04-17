@@ -2,7 +2,6 @@
 :date_created: 2019-08-20
 """
 
-
 import pytest
 
 from do_py.abc import ABCRestrictionMeta, ABCRestrictions
@@ -12,7 +11,6 @@ from .data import MyTestException
 
 
 class TestABCRestrictions:
-
     @pytest.mark.parametrize('def_new', [False, True])
     def test_require_decorator(self, def_new):
         def __new__():
@@ -43,8 +41,7 @@ class TestABCRestrictions:
         assert SubOk
         assert SubOk.x == 1
 
-        MiddleLayerOk = type('MiddleLayerOk', (RestrictedOk,), {ConstABCR.is_abstract: True,
-                                                                '__module__': __name__})
+        MiddleLayerOk = type('MiddleLayerOk', (RestrictedOk,), {ConstABCR.is_abstract: True, '__module__': __name__})
         assert MiddleLayerOk
         assert 'x' not in MiddleLayerOk.__dict__
 

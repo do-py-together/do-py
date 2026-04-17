@@ -1,6 +1,7 @@
 """
 :date_created: 2020-06-28
 """
+
 from datetime import date, datetime
 
 import pytest
@@ -20,18 +21,17 @@ class TestMgdDatetime:
     Test the instantiation and usages of the managed datetime object.
     """
 
-    @pytest.mark.parametrize('dt_obj, nullable, expected_restriction', [
-        (datetime, False, R.DATETIME),
-        (datetime, True, R.NULL_DATETIME),
-        (date, False, R.DATE),
-        (date, True, R.NULL_DATE),
-        pytest.param(None, True, None, marks=pytest.mark.xfail(raises=AssertionError))
-        ])
-    @pytest.mark.parametrize('default_key', [
-        'to',
-        'from',
-        None
-        ])
+    @pytest.mark.parametrize(
+        'dt_obj, nullable, expected_restriction',
+        [
+            (datetime, False, R.DATETIME),
+            (datetime, True, R.NULL_DATETIME),
+            (date, False, R.DATE),
+            (date, True, R.NULL_DATE),
+            pytest.param(None, True, None, marks=pytest.mark.xfail(raises=AssertionError)),
+        ],
+    )
+    @pytest.mark.parametrize('default_key', ['to', 'from', None])
     def test_restriction(self, dt_obj, nullable, expected_restriction, default_key):
         """
         The correct restriction should be used depending on dt_obj and nullable.
@@ -40,11 +40,14 @@ class TestMgdDatetime:
         if instance._restriction != expected_restriction:
             raise Exception('instance._restriction != expected_restriction')
 
-    @pytest.mark.parametrize('input, output', [
-        (test_dt_instance, test_dt_instance),
-        (test_dt_instance.isoformat(), test_dt_instance),
-        (None, test_dt_instance_epoch)
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_dt_instance, test_dt_instance),
+            (test_dt_instance.isoformat(), test_dt_instance),
+            (None, test_dt_instance_epoch),
+        ],
+    )
     def test_from_datetime(self, input, output):
         """
         :type input: datetime or str or None
@@ -53,11 +56,14 @@ class TestMgdDatetime:
         instance = MgdDatetime.from_from_datetime()
         assert output == instance(input)
 
-    @pytest.mark.parametrize('input, output', [
-        (test_date_instance_now, test_date_instance_now),
-        (test_date_instance_now.isoformat(), test_date_instance_now),
-        (None, test_dt_instance_epoch.date())
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_date_instance_now, test_date_instance_now),
+            (test_date_instance_now.isoformat(), test_date_instance_now),
+            (None, test_dt_instance_epoch.date()),
+        ],
+    )
     def test_from_date(self, input, output):
         """
         :type input: date or str or None
@@ -66,12 +72,15 @@ class TestMgdDatetime:
         instance = MgdDatetime.from_from_date()
         assert instance(input) == output
 
-    @pytest.mark.parametrize('input, output', [
-        (test_dt_instance_now, test_dt_instance_now),
-        (test_dt_instance_now.isoformat(), test_dt_instance_now),
-        # This creates race condition.
-        # pytest.param(None, test_dt_instance_now, marks=pytest.mark.xfail(raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_dt_instance_now, test_dt_instance_now),
+            (test_dt_instance_now.isoformat(), test_dt_instance_now),
+            # This creates race condition.
+            # pytest.param(None, test_dt_instance_now, marks=pytest.mark.xfail(raises=RestrictionError))
+        ],
+    )
     def test_to_datetime(self, input, output):
         """
         :type input: datetime or str or None
@@ -80,11 +89,14 @@ class TestMgdDatetime:
         instance = MgdDatetime.from_to_datetime()
         assert instance(input) == output
 
-    @pytest.mark.parametrize('input, output', [
-        (test_date_instance_now, test_date_instance_now),
-        (test_date_instance_now.isoformat(), test_dt_instance_now.date()),
-        (None, test_date_instance_now)
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_date_instance_now, test_date_instance_now),
+            (test_date_instance_now.isoformat(), test_dt_instance_now.date()),
+            (None, test_date_instance_now),
+        ],
+    )
     def test_to_date(self, input, output):
         """
         Test the classmethod `datetime` validates date ISO format properly and handles None.
@@ -94,14 +106,20 @@ class TestMgdDatetime:
         instance = MgdDatetime.from_to_date()
         assert output == instance(input)
 
-    @pytest.mark.parametrize('input, output', [
-        (test_dt_instance_now, test_dt_instance_now),
-        (test_dt_instance_now.isoformat(), test_dt_instance_now),
-        pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(test_date_instance_now.isoformat(), test_dt_instance_now,
-                     marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_dt_instance_now, test_dt_instance_now),
+            (test_dt_instance_now.isoformat(), test_dt_instance_now),
+            pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+            pytest.param(
+                test_date_instance_now.isoformat(),
+                test_dt_instance_now,
+                marks=pytest.mark.xfail(raises=RestrictionError),
+            ),
+            pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+        ],
+    )
     def test_datetime(self, input, output):
         """
         Test the classmethod `datetime` validates date ISO format properly and handles None.
@@ -111,14 +129,20 @@ class TestMgdDatetime:
         instance = MgdDatetime.datetime()
         assert instance(input) == output
 
-    @pytest.mark.parametrize('input, output', [
-        (test_dt_instance_now, test_dt_instance_now),
-        (test_dt_instance_now.isoformat(), test_dt_instance_now),
-        pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(test_date_instance_now.isoformat(), test_dt_instance_now,
-                     marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(None, None)
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_dt_instance_now, test_dt_instance_now),
+            (test_dt_instance_now.isoformat(), test_dt_instance_now),
+            pytest.param(test_date_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+            pytest.param(
+                test_date_instance_now.isoformat(),
+                test_dt_instance_now,
+                marks=pytest.mark.xfail(raises=RestrictionError),
+            ),
+            pytest.param(None, None),
+        ],
+    )
     def test_null_datetime(self, input, output):
         """
         Test the classmethod `null_datetime` validates date ISO format properly and handles None.
@@ -128,14 +152,20 @@ class TestMgdDatetime:
         instance = MgdDatetime.null_datetime()
         assert instance(input) == output
 
-    @pytest.mark.parametrize('input, output', [
-        (test_date_instance_now, test_date_instance_now),
-        (test_date_instance_now.isoformat(), test_date_instance_now),
-        pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(test_dt_instance_now.isoformat(), test_date_instance_now,
-                     marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_date_instance_now, test_date_instance_now),
+            (test_date_instance_now.isoformat(), test_date_instance_now),
+            pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+            pytest.param(
+                test_dt_instance_now.isoformat(),
+                test_date_instance_now,
+                marks=pytest.mark.xfail(raises=RestrictionError),
+            ),
+            pytest.param(None, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+        ],
+    )
     def test_date(self, input, output):
         """
         Test the classmethod `date` validates date ISO format properly and handles None.
@@ -145,14 +175,20 @@ class TestMgdDatetime:
         instance = MgdDatetime.date()
         assert instance(input) == output
 
-    @pytest.mark.parametrize('input, output', [
-        (test_date_instance_now, test_date_instance_now),
-        (test_date_instance_now.isoformat(), test_date_instance_now),
-        pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
-        pytest.param(test_dt_instance_now.isoformat(), test_date_instance_now,
-                     marks=pytest.mark.xfail(raises=RestrictionError)),
-        (None, None)
-        ])
+    @pytest.mark.parametrize(
+        'input, output',
+        [
+            (test_date_instance_now, test_date_instance_now),
+            (test_date_instance_now.isoformat(), test_date_instance_now),
+            pytest.param(test_dt_instance_now, None, marks=pytest.mark.xfail(raises=RestrictionError)),
+            pytest.param(
+                test_dt_instance_now.isoformat(),
+                test_date_instance_now,
+                marks=pytest.mark.xfail(raises=RestrictionError),
+            ),
+            (None, None),
+        ],
+    )
     def test_null_date(self, input, output):
         """
         Test the classmethod `null_date` validates date ISO format properly and handles None.

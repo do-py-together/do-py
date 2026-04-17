@@ -26,4 +26,4 @@ class DataObjectError(Exception):
         Movation:
         Catch -> Rethrow to add more information that would save debugging time.
         """
-        return cls("%s.%s: %s" % (cls_ref.__name__, key, restriction_error))
+        return cls('%s.%s: %s' % (cls_ref.__name__, key, restriction_error))

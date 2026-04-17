@@ -1,6 +1,7 @@
 """
 :date_created: 2020-06-28
 """
+
 from do_py.common import R
 from do_py.data_object.restriction import ManagedRestrictions
 from do_py.exceptions import RestrictionError
@@ -10,6 +11,7 @@ class ManagedList(ManagedRestrictions):
     """
     Use this when you need a restriction for a list of DataObject's.
     """
+
     _restriction = R(list, type(None))
 
     @property
@@ -43,7 +45,6 @@ class ManagedList(ManagedRestrictions):
 
 # TODO: Unit tests
 class OrderedManagedList(ManagedList):
-
     def __init__(self, obj_cls, nullable=False, key=None, reverse=False):
         """
         :param obj_cls: DataObject class reference to wrap each object in list.

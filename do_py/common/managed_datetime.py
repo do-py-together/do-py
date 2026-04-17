@@ -33,16 +33,11 @@ class MgdDatetime(ManagedRestrictions):
         A(data={'from_date': None}, strict=False)  # {"from_date": "1969-12-31"}
         A({'from_date': None})  # {"from_date": "1969-12-31"}
     """
+
     dt_obj = None
     _restriction = R()
-    _parse_dt_fmt = {
-        datetime: '%Y-%m-%dT%H:%M:%S',
-        date: '%Y-%m-%d'
-        }
-    defaults = {
-        'from': lambda dt: dt.fromtimestamp(0),
-        'to': lambda dt: dt.now() if dt is datetime else dt.today()
-        }
+    _parse_dt_fmt = {datetime: '%Y-%m-%dT%H:%M:%S', date: '%Y-%m-%d'}
+    defaults = {'from': lambda dt: dt.fromtimestamp(0), 'to': lambda dt: dt.now() if dt is datetime else dt.today()}
 
     def __init__(self, dt_obj=None, default_key=None, nullable=False, *args, **kwargs):
         """

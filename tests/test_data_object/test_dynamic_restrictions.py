@@ -2,6 +2,7 @@
 Test dynamic restriction class creation, inheritance and usage.
 :date_created: 2020-07-10
 """
+
 import pytest
 
 from do_py import DataObject, R
@@ -12,18 +13,16 @@ class MilkMetadata(DataObject):
     """
     Full of vitamins and minerals
     """
-    _restrictions = {
-        'flavor': R('chocolate', 'normal')
-        }
+
+    _restrictions = {'flavor': R('chocolate', 'normal')}
 
 
 class CerealMetadata(DataObject):
     """
     Delicious.
     """
-    _restrictions = {
-        'brand': R('frosted-flakes', 'cheerios')
-        }
+
+    _restrictions = {'brand': R('frosted-flakes', 'cheerios')}
 
 
 dynamic_item = dynamic_restriction_mixin('item', 'item_metadata', milk=MilkMetadata, cereal=CerealMetadata)
@@ -33,11 +32,8 @@ class Breakfast(dynamic_item):
     """
     What is the most important meal of the day?
     """
-    _restrictions = {
-        'item': R('milk', 'cereal'),
-        'item_metadata': R(),
-        'name': R.NULL_STR
-        }
+
+    _restrictions = {'item': R('milk', 'cereal'), 'item_metadata': R(), 'name': R.NULL_STR}
 
     def __init__(self, data=None, **kwargs):
         if data and 'name' not in data:
@@ -54,30 +50,23 @@ class TestDynamicDataObject:
         """
         Test basic instantiation.
         """
-        breakfast = Breakfast({
-            'item': 'milk',
-            'item_metadata': {
-                'flavor': 'chocolate'
-                }
-            })
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
         assert breakfast.item == 'milk'
         assert isinstance(breakfast.item_metadata, MilkMetadata)
         assert breakfast.item_metadata.flavor == 'chocolate'
 
-    @pytest.mark.parametrize('item_metadata', [
-        MilkMetadata({'flavor': 'normal'}),
-        pytest.param(CerealMetadata({'brand': 'cheerios'}), marks=pytest.mark.xfail)
-        ])
+    @pytest.mark.parametrize(
+        'item_metadata',
+        [
+            MilkMetadata({'flavor': 'normal'}),
+            pytest.param(CerealMetadata({'brand': 'cheerios'}), marks=pytest.mark.xfail),
+        ],
+    )
     def test_set(self, item_metadata):
         """
         Test basic setting of a dynamic value.
         """
-        breakfast = Breakfast({
-            'item': 'milk',
-            'item_metadata': {
-                'flavor': 'chocolate'
-                }
-            })
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
         breakfast.item_metadata = item_metadata
         assert breakfast.item_metadata.flavor == 'normal'
 
@@ -85,12 +74,7 @@ class TestDynamicDataObject:
         """
         Test the setting in the child dynamic restriction works fine.
         """
-        breakfast = Breakfast({
-            'item': 'milk',
-            'item_metadata': {
-                'flavor': 'chocolate'
-                }
-            })
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
         assert breakfast.item_metadata.flavor == 'chocolate'
         breakfast.item_metadata.flavor = 'normal'
         assert breakfast.item_metadata.flavor == 'normal'
@@ -112,10 +96,11 @@ class TestInheritance:
             """
             What is the most important meal of the day?
             """
+
             _restrictions = {
                 'item': R('milk', 'cereal'),
                 'item_metadata': R(),
-                }
+            }
 
         assert Breakfast2
 
@@ -130,10 +115,11 @@ class TestInheritance:
             """
             What is the most important meal of the day?
             """
+
             _restrictions = {
                 'item': R('milk', 'cereal'),
                 'item_metadata': R(),
-                }
+            }
 
         assert Breakfast2
 
@@ -148,10 +134,11 @@ class TestInheritance:
             """
             What is the most important meal of the day?
             """
+
             _restrictions = {
                 'item': R('milk', 'cereal'),
                 'item_metadata': R(),
-                }
+            }
 
         assert Breakfast2
 
@@ -166,10 +153,11 @@ class TestInheritance:
             """
             What is the most important meal of the day?
             """
+
             _restrictions = {
                 'item': R('milk'),
                 'item_metadata': R(),
-                }
+            }
 
         assert Breakfast2
 
@@ -179,12 +167,7 @@ class TestInheritance:
         """
         # Validate the starting condition.
         assert Breakfast._restrictions['item_metadata'] == R()
-        milk = Breakfast({
-            'item': 'milk',
-            'item_metadata': MilkMetadata({
-                'flavor': 'chocolate'
-                })
-            })
+        milk = Breakfast({'item': 'milk', 'item_metadata': MilkMetadata({'flavor': 'chocolate'})})
         # Ensure the instance's restrictions were updated correctly.
         assert milk._restrictions['item_metadata'] == MilkMetadata
 
@@ -192,12 +175,7 @@ class TestInheritance:
         assert Breakfast._restrictions['item_metadata'] == R()
 
         # Validate a second instance is created correctly and the restrictions do not clash.
-        milk = Breakfast({
-            'item': 'cereal',
-            'item_metadata': CerealMetadata({
-                'brand': 'cheerios'
-                })
-            })
+        milk = Breakfast({'item': 'cereal', 'item_metadata': CerealMetadata({'brand': 'cheerios'})})
         assert milk._restrictions['item_metadata'] == CerealMetadata
         assert Breakfast._restrictions['item_metadata'] == R()
 
@@ -207,20 +185,10 @@ class TestInheritance:
         """
         # Validate the starting condition.
         assert Breakfast._restrictions['item_metadata'] == R()
-        milk = Breakfast({
-            'item': 'milk',
-            'item_metadata': MilkMetadata({
-                'flavor': 'chocolate'
-                })
-            })
+        milk = Breakfast({'item': 'milk', 'item_metadata': MilkMetadata({'flavor': 'chocolate'})})
         # Ensure the instance's restrictions were updated correctly.
         assert milk._restrictions['item_metadata'] == MilkMetadata
 
-        cereal = Breakfast({
-            'item': 'cereal',
-            'item_metadata': CerealMetadata({
-                'brand': 'frosted-flakes'
-                })
-            })
+        cereal = Breakfast({'item': 'cereal', 'item_metadata': CerealMetadata({'brand': 'frosted-flakes'})})
         assert cereal._restrictions['item_metadata'] == CerealMetadata
         assert milk._restrictions['item_metadata'] == MilkMetadata

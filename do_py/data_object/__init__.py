@@ -37,6 +37,7 @@ class DataObject(RestrictedDictMixin):
 
     :attribute _restrictions: dictionary defining data structure and valid values.
     """
+
     _schema = None
 
     @classmethod

@@ -62,6 +62,10 @@ addopts = "-so xfail_strict=True --durations 10 --maxfail 10"
 line-length = 120
 target-version = "py310"
 
+[tool.ruff.format]
+# Preserve the codebase's existing single-quote style.
+quote-style = "single"
+
 [tool.ruff.lint]
 # Sensible default lint set without being too aggressive on a legacy
 # codebase. Phase 6 will broaden this and add type annotations.
