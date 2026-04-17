@@ -75,13 +75,9 @@ select = [
 ignore = [
     "E501",   # line-too-long — line-length is advisory; long docstrings/URLs happen
     "E721",   # use isinstance() — DataObject intentionally uses `type(x) is T` for strict (non-subtype) checks
-    "E731",   # lambda assignment — a couple of intentional usages; Phase 6 will revisit
-    "B006",   # mutable default args — 2 real but non-urgent cases (deepcopy memodict); Phase 6
     "B008",   # function call in argument default — false positive heavy for dataclass-like APIs
-    "B904",   # use `raise X from Y` — broader exception handling cleanup in Phase 6
-    "B905",   # zip without strict=  — needs domain review; Phase 6
-    "UP031",  # printf-style formatting — pervasive in error-message templates; converting changes deferred-
-              # formatting semantics. Phase 6.
+    "UP031",  # printf-style formatting — pervasive in error-message templates; converting would change
+              # deferred-formatting semantics (templates are used as `MSG % args` at call sites).
     "UP008",  # super() without args — NOT safe on this codebase. The @ABCRestrictions.require decorator
               # rebuilds decorated classes via `meta(name, bases, namespace)`, which copies methods from
               # the original class's dict. Methods' implicit __class__ cell still references the ORIGINAL
