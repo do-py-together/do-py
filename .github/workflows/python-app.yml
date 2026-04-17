@@ -30,7 +30,6 @@ jobs:
             --cov-report html \
             --cov-report xml \
             --junitxml test-reports/tests.xml \
-            --cov-config=./tests/.coveragerc \
             ./tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
