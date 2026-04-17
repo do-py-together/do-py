@@ -3,7 +3,6 @@
 """
 from copy import deepcopy
 
-
 from do_py import R
 from do_py.data_object import DataObject, Restriction
 
@@ -19,7 +18,7 @@ class Address(DataObject):
         }
 
 
-class TestDataObjectCopy(object):
+class TestDataObjectCopy:
     """
     Copying the restrictions of an object is a very useful way to have objects with similar keys.
     """

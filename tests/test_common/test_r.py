@@ -8,7 +8,7 @@ import pytest
 from do_py.common import R
 
 
-class TestR(object):
+class TestR:
 
     @pytest.mark.parametrize('attr', [r for r in dir(R) if not r.startswith('__')])
     def test_r_constants(self, attr):

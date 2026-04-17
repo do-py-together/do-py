@@ -23,6 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: uv sync --group dev
+      - name: Lint with ruff
+        run: uv run ruff check do_py tests
       - name: Run unit tests
         run: |
           uv run pytest \
@@ -30,7 +32,6 @@ jobs:
             --cov-report html \
             --cov-report xml \
             --junitxml test-reports/tests.xml \
-            --cov-config=./tests/.coveragerc \
             ./tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

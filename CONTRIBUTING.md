@@ -34,6 +34,16 @@ mise run test        # or: uv run pytest ./tests/
 Code coverage reports for master, branches, and PRs are posted in
 [CodeCov](https://codecov.io/gh/do-py-together/do-py).
 
+### Linting
+
+```bash
+mise run lint        # or: uv run ruff check do_py tests
+mise run format      # or: uv run ruff format do_py tests
+```
+
+Ruff config lives in `[tool.ruff]` in `pyproject.toml`. CI runs
+`ruff check` on every PR.
+
 ### Building and publishing
 
 ```bash

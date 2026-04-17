@@ -3,7 +3,7 @@ Constants to support base_model modules.
 :date_created: 2018-12-05
 """
 
-class ConstABCR(object):
+class ConstABCR:
     """
     Constants supporting ABCRestrictions
     """

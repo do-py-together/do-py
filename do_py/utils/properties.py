@@ -6,7 +6,7 @@ Property decorators useful for organizing code in a DO.
 import inspect
 
 
-class classproperty(object):
+class classproperty:
     """
     This is a decorator.
     https://stackoverflow.com/questions/3203286/how-to-create-a-read-only-class-property-in-python
@@ -25,7 +25,7 @@ class classproperty(object):
         return self.f(owner)
 
 
-class cached_classproperty(object):
+class cached_classproperty:
     """
     This builds on the same idea as `classproperty`.
     This is a decorator.
@@ -80,7 +80,7 @@ def cached_property(original_property):
             setattr(self, attr, original_property(self))
         return getattr(self, attr)
 
-    setattr(worker, '_cached_', True)
+    worker._cached_ = True
     worker.__name__ = original_property.__name__
     worker.__doc__ = original_property.__doc__
     return property(fget=worker)
@@ -111,7 +111,7 @@ def is_classmethod(cls, method):
     :type method: callable
     :rtype: bool
     """
-    return inspect.ismethod(method) and hasattr(method, '__self__') and getattr(method, '__self__') is cls
+    return inspect.ismethod(method) and hasattr(method, '__self__') and method.__self__ is cls
 
 
 def is_property(attribute):

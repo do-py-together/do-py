@@ -3,6 +3,7 @@ Test managed restrictions.
 :date_created: 2019-03-12
 """
 import itertools as it
+
 import pytest
 
 from do_py.common import R
@@ -49,7 +50,7 @@ class A(Validator):
         assert self.city in city_state[self.state], 'Mismatched city and state'
 
 
-class TestManagedRestrictions(object):
+class TestManagedRestrictions:
 
     @pytest.fixture(params=['john smith'])
     def name(self, request):

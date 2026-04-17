@@ -3,10 +3,10 @@ Custom Abstract Base Classes to implement Restrictions. Developed for DataObject
 :date_created: 2018-12-05
 """
 
+from ..utils import classproperty
 from .constants import ConstABCR
 from .messages import SystemMessages
 from .utils import already_declared, compare_cls
-from ..utils import classproperty
 
 
 class ABCRestrictionMeta(type):
@@ -131,7 +131,7 @@ class ABCRestrictionMeta(type):
         return cls
 
 
-class ABCRestrictions(object):
+class ABCRestrictions:
     """
     ABCRestrictionMeta implementation via decorators.
     """

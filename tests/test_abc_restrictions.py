@@ -7,10 +7,11 @@ import pytest
 
 from do_py.abc import ABCRestrictionMeta, ABCRestrictions
 from do_py.abc.constants import ConstABCR
+
 from .data import MyTestException
 
 
-class TestABCRestrictions(object):
+class TestABCRestrictions:
 
     @pytest.mark.parametrize('def_new', [False, True])
     def test_require_decorator(self, def_new):
@@ -102,7 +103,7 @@ class TestABCRestrictions(object):
     @pytest.mark.parametrize('parent_class', sorted(ABCRestrictionMeta.abc_classes.keys(), key=lambda x: x.__name__))
     def test_not_instantiable(self, parent_class):
         try:
-            obj = parent_class()
+            parent_class()
             assert False
         except NotImplementedError:
             assert True

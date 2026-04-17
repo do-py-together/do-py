@@ -1,11 +1,10 @@
 import json
-
 from datetime import datetime
 
 from do_py.utils.json_encoder import MyJSONEncoder
 
 
-class TestMyJSONEncoder(object):
+class TestMyJSONEncoder:
 
     def test(self):
         today_datetime = datetime.today()
