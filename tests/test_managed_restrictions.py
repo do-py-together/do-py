@@ -114,10 +114,8 @@ class TestManagedRestrictions:
     @pytest.mark.parametrize('state', ['TX'])
     def test_recovery(self, name, age, city, state, valid_city, invalid_city):
         a = A(data={'name': name, 'age': age, 'city': city, 'state': state})
-        try:
+        with pytest.raises(AssertionError):
             a.city = invalid_city
-        except Exception:
-            pass
 
         def f_attr(kv):
             return getattr(a, kv[0]) == kv[1]
@@ -142,10 +140,8 @@ class TestManagedRestrictions:
     def test_data_corruption_robustness(self, name, age, invalid_city, city, state):
         a = A(data={'name': name, 'age': age, 'city': city, 'state': state})
         assert a.city == city
-        try:
-            a.city = invalid_city
-            assert False
-        except Exception:
-            assert True
 
-        assert a.city == city
+        with pytest.raises(AssertionError):
+            a.city = invalid_city
+
+        assert a.city == city, 'Data was corrupted after failed validation'

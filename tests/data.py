@@ -21,7 +21,3 @@ data = [
 short_data = [data[0]]
 keys = ['id', 'name', 'status', pytest.param('random', marks=pytest.mark.xfail)]
 key_values = [('id', 1), ('name', 'yay'), ('status', 1), pytest.param('random', 'random', marks=pytest.mark.xfail)]
-
-
-class MyTestException(Exception):
-    pass
