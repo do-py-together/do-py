@@ -117,16 +117,20 @@ class TestManagedRestrictions:
         except Exception:
             pass
 
-        f_attr = lambda kv: getattr(a, kv[0]) == kv[1]
-        f_item = lambda kv: a[kv[0]] == kv[1]
+        def f_attr(kv):
+            return getattr(a, kv[0]) == kv[1]
+
+        def f_item(kv):
+            return a[kv[0]] == kv[1]
+
         v1 = [city, age, name, state]
         v2 = [valid_city, age, name, state]
         k = ['city', 'age', 'name', 'state']
 
         for _k, _v, _city in [(k, v1, city), (k, v2, valid_city)]:
             a.city = _city
-            assert all([e for e in map(f_attr, zip(_k, _v))]), 'Incorrect attrs'
-            assert all([e for e in map(f_item, zip(_k, _v))]), 'Incorrect items'
+            assert all([e for e in map(f_attr, zip(_k, _v, strict=True))]), 'Incorrect attrs'
+            assert all([e for e in map(f_item, zip(_k, _v, strict=True))]), 'Incorrect items'
 
     @pytest.mark.parametrize('name', ['John Smith'])
     @pytest.mark.parametrize('age', [20])
