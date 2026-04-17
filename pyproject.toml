@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "do-py"
-version = "0.4.1"
+version = "1.0.0"
 description = "Data validation and standardization library wrapping Python dictionaries."
 readme = "README.md"
 license = { text = "MIT" }
@@ -13,7 +13,7 @@ requires-python = ">=3.10"
 dependencies = []
 keywords = ["development", "OO"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Operating System :: OS Independent",
