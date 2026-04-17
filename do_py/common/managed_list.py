@@ -61,4 +61,5 @@ class OrderedManagedList(ManagedList):
         Sort the data list after ManagedList does its work.
         """
         super(OrderedManagedList, self).manage()
-        self.data = sorted(self.data, key=self.key, reverse=self.reverse)
+        if self.data is not None:
+            self.data = sorted(self.data, key=self.key, reverse=self.reverse)
