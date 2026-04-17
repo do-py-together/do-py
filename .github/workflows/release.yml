@@ -1,0 +1,59 @@
+# Publishes do-py to PyPI via OIDC trusted publishing.
+#
+# Trigger: a GitHub Release is published. This workflow checks out the
+# tag the release points at, builds sdist + wheel with uv, and uploads
+# to PyPI using an OIDC-issued short-lived token \u2014 no long-lived secrets
+# are stored in the repo.
+#
+# One-time PyPI setup required before this can succeed:
+#   https://pypi.org/manage/project/do-py/settings/publishing/
+# Add a pending publisher with:
+#   Owner           : do-py-together
+#   Repository name : do-py
+#   Workflow name   : release.yml
+#   Environment name: pypi
+#
+# Docs: https://docs.pypi.org/trusted-publishers/
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    # The "pypi" environment can be configured in repo settings to
+    # require manual approval before publishing, scope the id-token
+    # permission, etc. https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment
+    environment:
+      name: pypi
+      url: https://pypi.org/p/do-py
+    permissions:
+      # Required for OIDC trusted publishing. No other permissions needed.
+      id-token: write
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: '3.12'
+      - name: Verify tag matches pyproject.toml version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pyver=$(uv run --no-project python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "Git tag version:     $tag"
+          echo "pyproject.toml ver:  $pyver"
+          if [ "$tag" != "$pyver" ]; then
+            echo "::error::Tag '$GITHUB_REF_NAME' does not match pyproject.toml version '$pyver'"
+            exit 1
+          fi
+      - name: Build sdist and wheel
+        run: uv build
+      - name: Inspect built artifacts
+        run: ls -la dist/
+      - name: Publish to PyPI (trusted publishing)
+        run: uv publish --trusted-publishing always

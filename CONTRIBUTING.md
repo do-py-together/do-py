@@ -44,12 +44,38 @@ mise run format      # or: uv run ruff format do_py tests
 Ruff config lives in `[tool.ruff]` in `pyproject.toml`. CI runs
 `ruff check` on every PR.
 
-### Building and publishing
+### Building
 
 ```bash
 mise run build       # uv build  -> sdist + wheel in ./dist
-mise run publish     # uv publish
 ```
+
+### Releasing
+
+Releases are published to PyPI automatically via GitHub Actions using
+[OIDC trusted publishing](https://docs.pypi.org/trusted-publishers/) —
+no API tokens are stored in the repo.
+
+To cut a release:
+
+1. Bump `[project].version` in `pyproject.toml` on a PR, get it merged
+   to `master`.
+2. Update `CHANGELOG.md` with the release date and notes on the same
+   PR (or a follow-up).
+3. On GitHub, go to **Releases → Draft a new release**.
+4. Create a new tag `vX.Y.Z` (matching the version in `pyproject.toml`)
+   targeting `master`.
+5. Fill in release notes (use the CHANGELOG section as a starting
+   point) and click **Publish release**.
+6. The `.github/workflows/release.yml` workflow runs automatically,
+   builds sdist + wheel with `uv build`, and uploads to PyPI.
+
+The release workflow verifies that the git tag matches
+`pyproject.toml`'s version before publishing, so a mismatch will fail
+fast instead of shipping wrong metadata.
+
+If you need to publish locally (e.g. to TestPyPI) you can still run
+`mise run publish` with a PyPI API token in `UV_PUBLISH_TOKEN`.
 
 ## Developer Notes
 
