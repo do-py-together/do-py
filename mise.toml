@@ -1,0 +1,41 @@
+# mise.dev config: https://mise.jdx.dev/configuration.html
+# Pins the project's Python interpreter and uv version, and exposes
+# common dev tasks. Run `mise install` to bootstrap, then `mise tasks`
+# to see what's available.
+
+[tools]
+python = "3.12"
+uv = "latest"
+
+[tasks.install]
+description = "Install project + dev dependencies"
+run = "uv sync --group dev"
+
+[tasks.test]
+description = "Run the test suite with coverage"
+run = """
+uv run pytest \
+    --cov ./ \
+    --cov-report html \
+    --cov-report xml \
+    --junitxml test-reports/tests.xml \
+    --cov-config=./tests/.coveragerc \
+    ./tests/
+"""
+
+[tasks.build]
+description = "Build sdist and wheel into ./dist"
+run = "uv build"
+
+[tasks.publish]
+description = "Publish ./dist/* to PyPI"
+run = "uv publish"
+
+[tasks.clean]
+description = "Remove build and test artifacts"
+run = """
+rm -rf \
+    build dist *.egg-info \
+    .coverage coverage.xml htmlcov test-reports \
+    .pytest_cache .ruff_cache .mypy_cache
+"""

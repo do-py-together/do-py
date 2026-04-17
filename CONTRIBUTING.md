@@ -7,24 +7,38 @@ functions and turns them off.
 
 ## Development Setup
 
-### Environment
-```bash
-# Install do-py in development mode
-python setup.py develop
+This project uses [mise](https://mise.jdx.dev) to manage the Python interpreter and
+[uv](https://docs.astral.sh/uv/) for dependency management and builds.
 
-# Install all dependencies. yarn, pipenv, and then run the following command.
-pipenv install --dev
+### Environment
+
+```bash
+# One-time: install mise (https://mise.jdx.dev/installing-mise.html)
+# Then, inside the repo:
+mise install         # Installs Python and uv per mise.toml
+mise run install     # uv sync --group dev
+```
+
+If you'd rather not use mise, uv alone is sufficient:
+
+```bash
+uv sync --group dev
 ```
 
 ### Testing
 
-Run unit tests locally with `pipenv run test`. Code coverage reports for master, branches, and PRs are posted
-in [CodeCov](https://codecov.io/gh/do-py-together/do-py).
+```bash
+mise run test        # or: uv run pytest ./tests/
+```
 
-### Linting
+Code coverage reports for master, branches, and PRs are posted in
+[CodeCov](https://codecov.io/gh/do-py-together/do-py).
+
+### Building and publishing
 
 ```bash
-pipenv run lint
+mise run build       # uv build  -> sdist + wheel in ./dist
+mise run publish     # uv publish
 ```
 
 ## Developer Notes
