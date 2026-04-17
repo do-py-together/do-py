@@ -90,12 +90,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# Re-exports from package __init__.py look like unused imports to ruff.
-# Long-term we can add explicit __all__ or `X as X` syntax; for now,
-# ignore F401 in these specific files.
-"do_py/__init__.py" = ["F401"]
-"do_py/exceptions/__init__.py" = ["F401"]
-"do_py/utils/__init__.py" = ["F401"]
 "tests/**" = [
     "B011",  # `assert False` is idiomatic in some test patterns here
 ]
