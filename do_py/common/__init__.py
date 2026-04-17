@@ -8,7 +8,7 @@ from do_py.data_object import Restriction
 from do_py.utils import classproperty
 
 
-class R(object):
+class R:
     """
     The definition of a restriction for DataObjects:
     1. Allowed types or values.

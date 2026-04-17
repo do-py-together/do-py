@@ -9,14 +9,13 @@ from do_py import R
 from do_py.common.managed_datetime import MgdDatetime
 from do_py.exceptions import RestrictionError
 
-
 test_dt_instance_epoch = datetime.fromtimestamp(0).replace(microsecond=0)
 test_dt_instance = datetime(year=2019, month=9, day=25, hour=10, minute=0, second=0).replace(microsecond=0)
 test_dt_instance_now = datetime.now().replace(microsecond=0)
 test_date_instance_now = datetime.now().replace(microsecond=0).date()
 
 
-class TestMgdDatetime(object):
+class TestMgdDatetime:
     """
     Test the instantiation and usages of the managed datetime object.
     """

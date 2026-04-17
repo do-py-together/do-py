@@ -11,9 +11,16 @@ import pytest
 
 from do_py import DataObject
 from do_py.common import R
-from do_py.data_object.restriction import AbstractRestriction, ManagedRestrictions, SingletonRestriction, \
-    _DataObjectRestriction, _ListTypeRestriction, _ListValueRestriction, _MgdRestRestriction, \
-    _NullableDataObjectRestriction
+from do_py.data_object.restriction import (
+    AbstractRestriction,
+    ManagedRestrictions,
+    SingletonRestriction,
+    _DataObjectRestriction,
+    _ListTypeRestriction,
+    _ListValueRestriction,
+    _MgdRestRestriction,
+    _NullableDataObjectRestriction,
+)
 from do_py.exceptions import DataObjectError, RestrictionError
 
 
@@ -49,7 +56,7 @@ class SampleC(DataObject):
         }
 
 
-class TestRestriction(object):
+class TestRestriction:
 
     def test_es_restrictions_override(self):
         r = {'type': 'text'}
@@ -116,7 +123,7 @@ class TestRestriction(object):
     @pytest.mark.parametrize('data', [
         None,
         'a',
-        str('b'),
+        'b',
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])
     def test_null_str_values(self, data):
@@ -124,7 +131,7 @@ class TestRestriction(object):
 
     @pytest.mark.parametrize('data', [
         'a',
-        str('b'),
+        'b',
         pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
         pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
         ])

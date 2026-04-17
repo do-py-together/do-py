@@ -3,12 +3,17 @@ Test the property decorators and related utils.
 """
 import time
 
+from do_py.utils.properties import (
+    cached_classproperty,
+    cached_property,
+    classproperty,
+    is_cached_property,
+    is_classmethod,
+    is_property,
+)
 
-from do_py.utils.properties import cached_classproperty, cached_property, classproperty, is_cached_property, \
-    is_classmethod, is_property
 
-
-class ATest(object):
+class ATest:
     """
     Dummy class for testing `is_classmethod` and `is_property`.
     """

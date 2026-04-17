@@ -10,6 +10,7 @@ import pytest
 from do_py import DataObject
 from do_py.common import R
 from do_py.exceptions import DataObjectError, RestrictionError
+
 from ..data import A, MyTestException, data, keys, short_data
 
 
@@ -23,7 +24,7 @@ def our_hasattr(instance, name):
     return name in instance.__dict__
 
 
-class TestDataObject(object):
+class TestDataObject:
 
     @pytest.mark.parametrize('id, name, status', data)
     def test_init(self, id, name, status):

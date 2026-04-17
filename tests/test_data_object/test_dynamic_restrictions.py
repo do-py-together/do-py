@@ -42,10 +42,10 @@ class Breakfast(dynamic_item):
     def __init__(self, data=None, **kwargs):
         if data and 'name' not in data:
             data['name'] = None
-        super(Breakfast, self).__init__(data=data, **kwargs)
+        super().__init__(data=data, **kwargs)
 
 
-class TestDynamicDataObject(object):
+class TestDynamicDataObject:
     """
     Test basic usages of the Breakfast example.
     """
@@ -96,7 +96,7 @@ class TestDynamicDataObject(object):
         assert breakfast.item_metadata.flavor == 'normal'
 
 
-class TestInheritance(object):
+class TestInheritance:
     """
     Test inheritance and rules/checks.
     """

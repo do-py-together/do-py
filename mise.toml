@@ -11,6 +11,14 @@ uv = "latest"
 description = "Install project + dev dependencies"
 run = "uv sync --group dev"
 
+[tasks.lint]
+description = "Run ruff linter"
+run = "uv run ruff check do_py tests"
+
+[tasks.format]
+description = "Run ruff formatter (also sorts imports)"
+run = "uv run ruff format do_py tests"
+
 [tasks.test]
 description = "Run the test suite with coverage"
 run = """

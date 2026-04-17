@@ -496,7 +496,7 @@ class _DataObjectRestriction(_NullableDataObjectRestriction):
         return self._allowed(data=data, strict=strict)
 
 
-class Restriction(object):
+class Restriction:
     """
     Restriction factory which manages restriction delegation.
     """
@@ -584,7 +584,7 @@ class Restriction(object):
             return cls(declaration)
 
 
-class ManagedRestrictions(object, metaclass=ABCMeta):
+class ManagedRestrictions(metaclass=ABCMeta):
     """
     Useful for managing complex data validations for restrictions in DataObject. E.g.
     1. Regular expression validation such as review URL matches expected template.
@@ -672,7 +672,7 @@ class ManagedRestrictions(object, metaclass=ABCMeta):
 
 
 # NOTE: ESR should be refactored to common.py, but OOS for now due to circular imports with ESEncoder
-class ESR(object):
+class ESR:
     """
     Constants class housing the different types of ES restrictions.
     """
@@ -712,7 +712,7 @@ class ESR(object):
             }
 
 
-class ESEncoder(object):
+class ESEncoder:
     """
     Convert restrictions into ES Document Property Map
     Ref: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html

@@ -31,7 +31,7 @@ class Library(DataObject):
         }
 
 
-class TestManagedList(object):
+class TestManagedList:
     book_1 = {
         'title': '1',
         'author': 'Author 1'
