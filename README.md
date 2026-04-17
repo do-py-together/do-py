@@ -2,7 +2,7 @@
 Do-Py, shorthand for DataObject Python, is a data-validation and standardization library wrapping Python dictionaries.
 
 ![release](https://img.shields.io/github/package-json/v/do-py-together/do-py?label=release&logo=release&style=flat-square)
-![build](https://img.shields.io/github/workflow/status/do-py-together/do-py/test?style=flat-square)
+![build](https://img.shields.io/github/actions/workflow/status/do-py-together/do-py/python-app.yml?branch=master&style=flat-square)
 ![coverage](https://img.shields.io/codecov/c/github/do-py-together/do-py?style=flat-square)
 ![dependencies](https://img.shields.io/librariesio/release/pypi/do-py?style=flat-square)
 
@@ -160,17 +160,21 @@ from do_py import DataObject, R
 
 
 class Contact(DataObject):
+    """
+    Contact information for an author.
+    :restriction phone_number: A phone number as a string.
+    """
     _restrictions = {
-        'phone_number'
+        'phone_number': R.STR
         }
 
 
 class Author(DataObject):
     """
-    A DataObject that contains all of my favorite items.
-    :restriction id:
-    :restriction favorite_candy: My favorite candy, this is restricted by value.
-    :restriction favorite_movie: My favorite movie. This is optional because a `None` IS allowed!
+    An author of a video game.
+    :restriction id: The author's id.
+    :restriction name: The author's name.
+    :restriction contact: Nested Contact DataObject.
     """
     _restrictions = {
         'id': R.INT,
@@ -181,10 +185,10 @@ class Author(DataObject):
 
 class VideoGame(DataObject):
     """
-    A DataObject that contains all of my favorite items.
-    :restriction id:
-    :restriction favorite_candy: My favorite candy, this is restricted by value.
-    :restriction favorite_movie: My favorite movie. This is optional because a `None` IS allowed!
+    A video game, authored by someone.
+    :restriction id: The video game's id.
+    :restriction name: The video game's name (optional).
+    :restriction author: Nested Author DataObject.
     """
     _restrictions = {
         'id': R.INT,
@@ -193,12 +197,18 @@ class VideoGame(DataObject):
         }
 
 
-# Data objects must be instantiated at their **init** with a dictionary and
-#   strict(True(default) or False)
+# DataObjects must be instantiated with a dictionary and strict=True (default) or False.
+# Nested DataObjects are built recursively from nested dicts.
 instance = VideoGame({
-    'favorite_number': 1985,
-    'favorite_candy': 'Jolly Ranchers',
-    'favorite_movie': 'Jolly Green Giant'
+    'id': 1985,
+    'name': 'Super Mario Bros.',
+    'author': {
+        'id': 1,
+        'name': 'Shigeru Miyamoto',
+        'contact': {
+            'phone_number': '555-0100'
+            }
+        }
     })
 
 print(instance)

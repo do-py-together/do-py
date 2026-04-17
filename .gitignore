@@ -1,12 +1,17 @@
 # Python compile and backup files
 *.pyc
 *.py.bak
+__pycache__/
 
 # Build and deploy
 build/
 dist/
-do_py.egg-info
+*.egg-info/
 node_modules/
+
+# Virtual envs
+.venv/
+venv/
 
 # Testing
 .coverage
@@ -16,7 +21,13 @@ htmlcov/
 test-reports/
 py2to3cov/
 
+# Lint / tool caches
+.ruff_cache/
+.mypy_cache/
+.tox/
+
 # Misc
 .idea/
+.vscode/
 .DS_Store
 .python-version
