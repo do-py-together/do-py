@@ -1,6 +1,7 @@
 """
 :date_created: 2021-09-23
 """
+
 from copy import deepcopy
 
 from do_py import R
@@ -11,11 +12,12 @@ class Address(DataObject):
     """
     DataObject to standardize address representation and storage. Validates if state belongs to country.
     """
+
     _restrictions = {
         'street': R.STR,
         'street2': R.NULL_STR,
         'city': R.STR,
-        }
+    }
 
 
 class TestDataObjectCopy:

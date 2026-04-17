@@ -3,6 +3,7 @@ Dynamic restrictions for a DataObject.
 :date_created: 2020-07-10
 :author: Gian Brazzini
 """
+
 import copy
 
 from do_py import DataObject, R
@@ -16,6 +17,7 @@ class DynamicRestrictions(ManagedRestrictions):
     A dict that contains the dynamic restrictions where the key is the independent
     key's value and the value is the dependent key's restriction.
     """
+
     _restriction = R()
 
     def manage(self):
@@ -34,11 +36,8 @@ class DynamicClassGenerator(DataObject):
     :restriction dependent_key: The key where the restriction is dynamic.
     :restriction dynamic_restrictions: See `DynamicRestrictions` ManagedList.
     """
-    _restrictions = {
-        'independent_key': R.STR,
-        'dependent_key': R.STR,
-        'dynamic_restrictions': DynamicRestrictions()
-        }
+
+    _restrictions = {'independent_key': R.STR, 'dependent_key': R.STR, 'dynamic_restrictions': DynamicRestrictions()}
 
     @property
     def update_fn_name(self):
@@ -72,7 +71,7 @@ class DynamicClassGenerator(DataObject):
             '_is_abstract_': True,
             '__module__': self.__class__.__module__,
             self.update_fn_name: update_restriction,
-            }
+        }
 
         # Create the class using ABCRestrictionMeta as the metaclass and inheriting from DataObject.
         return ABCRestrictionMeta('dynamic_%s_mixin' % self.dependent_key, (DataObject,), attributes)
@@ -124,19 +123,23 @@ class DynamicClassGenerator(DataObject):
             super(self.dynamic_class, cls).__compile__()
 
             # Validate that the independent and dependent keys must exist in the restrictions.
-            assert self.independent_key in cls._restrictions, \
+            assert self.independent_key in cls._restrictions, (
                 '%s.%s required in restrictions for dynamic restrictions.' % (cls.__name__, self.independent_key)
-            assert self.dependent_key in cls._restrictions, \
+            )
+            assert self.dependent_key in cls._restrictions, (
                 '%s.%s required in restrictions for dynamic restrictions.' % (cls.__name__, self.dependent_key)
+            )
 
             # Validate that the independent restriction is a list value restriction.
             independent_key_restriction = cls._restrictions[self.independent_key]
-            assert isinstance(independent_key_restriction, _ListValueRestriction), \
+            assert isinstance(independent_key_restriction, _ListValueRestriction), (
                 'The independent key must be of type `_ListValueRestriction`.'
+            )
 
             # Validate that all values for the independent restrictions are accounted for in the dynamic restrictions.
-            assert len(independent_key_restriction[0]) == len(self.dynamic_restrictions), \
+            assert len(independent_key_restriction[0]) == len(self.dynamic_restrictions), (
                 'All restrictions must be accounted for when creating dynamic restrictions.'
+            )
             for value in independent_key_restriction[0]:
                 assert value in self.dynamic_restrictions, 'Missing dynamic restriction for value "%s".' % value
 
@@ -165,8 +168,10 @@ def dynamic_restriction_mixin(independent_key, dependent_key, **kwargs):
     :param kwargs: The dynamic restrictions.
     :rtype: type(DataObject)
     """
-    return DynamicClassGenerator({
-        'independent_key': independent_key,
-        'dependent_key': dependent_key,
-        'dynamic_restrictions': kwargs,
-        }).mixin
+    return DynamicClassGenerator(
+        {
+            'independent_key': independent_key,
+            'dependent_key': dependent_key,
+            'dynamic_restrictions': kwargs,
+        }
+    ).mixin

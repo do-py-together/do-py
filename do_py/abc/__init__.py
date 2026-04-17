@@ -13,6 +13,7 @@ class ABCRestrictionMeta(type):
     """
     TODO
     """
+
     _abc_classes = set()
     _unique_attrs = dict()
 
@@ -42,8 +43,9 @@ class ABCRestrictionMeta(type):
 
                 if fn_new:
                     # Run explicitly defined __new__
-                    assert callable(fn_new) or hasattr(fn_new, '__func__'), \
+                    assert callable(fn_new) or hasattr(fn_new, '__func__'), (
                         'Failed to decipher how to run nested __new__ for %s' % this_cls
+                    )
                     if callable(fn_new):
                         return fn_new(this_cls, *args, **kwargs)
                     elif hasattr(fn_new, '__func__'):
@@ -61,8 +63,9 @@ class ABCRestrictionMeta(type):
 
         if ConstABCR.required in namespace:
             # Root-type and Node-type classes define namespace requirements for its children.
-            assert namespace.get(ConstABCR.state, ConstABCR.root) in ConstABCR.restrictions_allowed, \
+            assert namespace.get(ConstABCR.state, ConstABCR.root) in ConstABCR.restrictions_allowed, (
                 'Invalid class type=%s' % namespace.get(ConstABCR.state, ConstABCR.root)
+            )
             namespace[ConstABCR.state] = namespace.get(ConstABCR.state, ConstABCR.root)
 
             cls = type.__new__(mcs, cls_name, parents, namespace)
@@ -95,8 +98,9 @@ class ABCRestrictionMeta(type):
             required_attrs = set(sum([getattr(p, ConstABCR.required, ()) for p in roots + nodes], ()))
             for attr in required_attrs:
                 # Check that the required attribute is defined in this class or a leaf that is a parent of this class.
-                assert any([hasattr(p, attr) for p in leaves + nodes]) or attr in namespace, \
+                assert any([hasattr(p, attr) for p in leaves + nodes]) or attr in namespace, (
                     SystemMessages.REQUIRED_FOR % (attr, cls_name)
+                )
 
             # Validate that the value given to a unique attribute is unique system-wide for that attribute.
             unique_attrs = set(sum([getattr(p, ConstABCR.unique, ()) for p in roots + nodes], ()))
@@ -112,8 +116,9 @@ class ABCRestrictionMeta(type):
                         mcs._unique_attrs[attr].remove(leaf)
                         continue
 
-                    assert namespace[attr] != getattr(leaf, attr), \
+                    assert namespace[attr] != getattr(leaf, attr), (
                         'Unique value "%s" has already been declared in class %s' % (namespace[attr], leaf.__name__)
+                    )
 
             cls = type.__new__(mcs, cls_name, parents, namespace)
 
@@ -156,8 +161,9 @@ class ABCRestrictions:
             :return:
             """
             assert cls_ref not in ABCRestrictionMeta.abc_classes, SystemMessages.CLASS_ALREADY_DEFINED
-            assert getattr(cls_ref, ConstABCR.state, ConstABCR.root) in ConstABCR.restrictions_allowed, \
+            assert getattr(cls_ref, ConstABCR.state, ConstABCR.root) in ConstABCR.restrictions_allowed, (
                 SystemMessages.RESTRICTIONS_ALLOWED
+            )
 
             # Manipulate the namespace of the declared class so that metaclass handles it properly
             namespace = dict(cls_ref.__dict__)
@@ -166,8 +172,7 @@ class ABCRestrictions:
 
             # Check if required attributes passed in are new
             r = already_declared(cls_ref, ConstABCR.required, required_attrs)
-            assert not r, SystemMessages.ATTRIBUTE_ALREADY_DECLARED % ('Required', r,
-                                                                       "%s's parents" % cls_ref.__name__)
+            assert not r, SystemMessages.ATTRIBUTE_ALREADY_DECLARED % ('Required', r, "%s's parents" % cls_ref.__name__)
             namespace[ConstABCR.required] = required_attrs + getattr(cls_ref, ConstABCR.required, ())
 
             # Check if uniqueness requirements are declared for some attributes
@@ -192,7 +197,7 @@ class ABCRestrictions:
             else:
                 raise Exception(
                     'Metaclass ambiguity. Cannot use `ABCRestrictions.require` with %s.' % cls_type.__name__
-                    )
+                )
 
             return meta(cls_ref.__name__, cls_ref.__bases__, namespace)
 

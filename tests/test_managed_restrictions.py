@@ -2,6 +2,7 @@
 Test managed restrictions.
 :date_created: 2019-03-12
 """
+
 import itertools as it
 
 import pytest
@@ -15,6 +16,7 @@ class Name(ManagedRestrictions):
     """
     Manages name. Standardizes data to title case.
     """
+
     _restriction = R.STR
 
     def manage(self):
@@ -25,6 +27,7 @@ class Age(ManagedRestrictions):
     """
     Manages age. Validates and standardizes data.
     """
+
     _restriction = R.INT
 
     def manage(self):
@@ -34,8 +37,8 @@ class Age(ManagedRestrictions):
 
 city_state = {
     'TX': ['Dallas', 'Houston', 'Austin', 'San Antonio'],
-    'CA': ['Los Angeles', 'San Francisco', 'San Deigo', 'Sacramento']
-    }
+    'CA': ['Los Angeles', 'San Francisco', 'San Deigo', 'Sacramento'],
+}
 
 
 class A(Validator):
@@ -43,15 +46,14 @@ class A(Validator):
         'name': Name(),
         'age': Age(),
         'city': R(*[e for e in it.chain.from_iterable(city_state.values())]),
-        'state': R(*city_state.keys())
-        }
+        'state': R(*city_state.keys()),
+    }
 
     def _validate(self):
         assert self.city in city_state[self.state], 'Mismatched city and state'
 
 
 class TestManagedRestrictions:
-
     @pytest.fixture(params=['john smith'])
     def name(self, request):
         return request.param
@@ -60,9 +62,9 @@ class TestManagedRestrictions:
     def age(self, request):
         return request.param
 
-    @pytest.fixture(params=[('Austin', 'TX'),
-                            pytest.param(('Dallas', 'CA'),
-                                         marks=pytest.mark.xfail(reason='Invalid combination'))])
+    @pytest.fixture(
+        params=[('Austin', 'TX'), pytest.param(('Dallas', 'CA'), marks=pytest.mark.xfail(reason='Invalid combination'))]
+    )
     def city_state(self, request):
         return request.param
 
@@ -117,16 +119,20 @@ class TestManagedRestrictions:
         except Exception:
             pass
 
-        f_attr = lambda kv: getattr(a, kv[0]) == kv[1]
-        f_item = lambda kv: a[kv[0]] == kv[1]
+        def f_attr(kv):
+            return getattr(a, kv[0]) == kv[1]
+
+        def f_item(kv):
+            return a[kv[0]] == kv[1]
+
         v1 = [city, age, name, state]
         v2 = [valid_city, age, name, state]
         k = ['city', 'age', 'name', 'state']
 
         for _k, _v, _city in [(k, v1, city), (k, v2, valid_city)]:
             a.city = _city
-            assert all([e for e in map(f_attr, zip(_k, _v))]), 'Incorrect attrs'
-            assert all([e for e in map(f_item, zip(_k, _v))]), 'Incorrect items'
+            assert all([e for e in map(f_attr, zip(_k, _v, strict=True))]), 'Incorrect attrs'
+            assert all([e for e in map(f_item, zip(_k, _v, strict=True))]), 'Incorrect items'
 
     @pytest.mark.parametrize('name', ['John Smith'])
     @pytest.mark.parametrize('age', [20])

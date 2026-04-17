@@ -29,6 +29,7 @@ class AbstractRestriction(tuple):
     default:
     Every restriction provides a default value. If not explicitly specified, it is implicitly set to None.
     """
+
     _default = None
     _allowed = None
 
@@ -105,10 +106,12 @@ class AbstractRestriction(tuple):
     def __copy__(self):
         return tuple(self)
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
         """
         NOTE: `deepcopy` uses memoization to store a previously copied instance.
         """
+        if memodict is None:
+            memodict = {}
         _r = copy.deepcopy(self.__copy__())
         instance = self.__class__(_r[0], default=_r[1])
         memodict[id(self)] = instance
@@ -124,6 +127,7 @@ class SingletonRestriction(AbstractRestriction):
     This is an interface for Restriction type to use singleton structure. The objective is to use pre-defined
     restrictions and reduce the memory footprint of DataObject declarations.
     """
+
     _cache = {}
 
     def __new__(cls, restriction_tuple):
@@ -149,8 +153,8 @@ class SingletonRestriction(AbstractRestriction):
                 hashable = (cls.__name__, restriction_tuple[0])
             else:
                 hashable = (cls.__name__, frozenset(restriction_tuple[0]), rt1)
-        except TypeError:
-            raise RestrictionError.from_unhashable(restriction_tuple[0], restriction_tuple[1])
+        except TypeError as e:
+            raise RestrictionError.from_unhashable(restriction_tuple[0], restriction_tuple[1]) from e
 
         if hashable in cls._cache:
             return cls._cache[hashable]
@@ -447,11 +451,7 @@ class _NullableDataObjectRestriction(SingletonRestriction):
         if hasattr(self.dataobj, 'es_restrictions'):
             return self.dataobj.es_restrictions
         else:
-            return {
-                'properties': {
-                    k: v.es_restrictions for k, v in self.dataobj._restrictions.items()
-                    }
-                }
+            return {'properties': {k: v.es_restrictions for k, v in self.dataobj._restrictions.items()}}
 
 
 class _DataObjectRestriction(_NullableDataObjectRestriction):
@@ -614,6 +614,7 @@ class ManagedRestrictions(metaclass=ABCMeta):
 
     :attribute manage: users must implement validation/standardization logic in manage
     """
+
     data = None
 
     def __new__(cls, *args, **kwargs):
@@ -676,6 +677,7 @@ class ESR:
     """
     Constants class housing the different types of ES restrictions.
     """
+
     INT = {'type': 'integer'}
     FLOAT = {'type': 'float'}
     DATE = {'type': 'date'}
@@ -692,10 +694,7 @@ class ESR:
         """
         if not hasattr(nested_data_object, 'es_restrictions'):
             raise RestrictionError.bad_data(nested_data_object, 'DataObject')
-        return {
-            'type': 'object',
-            'properties': nested_data_object.es_restrictions
-            }
+        return {'type': 'object', 'properties': nested_data_object.es_restrictions}
 
     @staticmethod
     def NESTED(nested_data_object):
@@ -706,10 +705,7 @@ class ESR:
         """
         if not hasattr(nested_data_object, 'es_restrictions'):
             raise RestrictionError.bad_data(nested_data_object, 'DataObject')
-        return {
-            'type': 'nested',
-            'properties': nested_data_object.es_restrictions
-            }
+        return {'type': 'nested', 'properties': nested_data_object.es_restrictions}
 
 
 class ESEncoder:
@@ -732,11 +728,11 @@ class ESEncoder:
             str: ESR.STR,
             'keyword': ESR.KEYWORD,
             # list: {},
-            }
+        }
 
     @classmethod
     def default(cls, obj):
         try:
             return cls.encoding[obj]
-        except KeyError:
-            raise RestrictionError('%s cannot be encoded!' % obj)
+        except KeyError as e:
+            raise RestrictionError('%s cannot be encoded!' % obj) from e

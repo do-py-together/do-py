@@ -3,10 +3,12 @@ Constants to support base_model modules.
 :date_created: 2018-12-05
 """
 
+
 class ConstABCR:
     """
     Constants supporting ABCRestrictions
     """
+
     required = '_required_'
     unique = '_unique_'
     metaclass = '__metaclass__'

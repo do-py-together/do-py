@@ -25,7 +25,6 @@ def our_hasattr(instance, name):
 
 
 class TestDataObject:
-
     @pytest.mark.parametrize('id, name, status', data)
     def test_init(self, id, name, status):
         a = A.create(id=id, name=name, status=status)
@@ -40,10 +39,9 @@ class TestDataObject:
 
     def test_class_namespace(self):
         try:
+
             class B(DataObject):
-                _restrictions = {
-                    'x': R.INT.with_default(1)
-                    }
+                _restrictions = {'x': R.INT.with_default(1)}
                 x = None
 
             B(data={'x': 1})
@@ -53,21 +51,17 @@ class TestDataObject:
         except Exception as e:
             assert False, str(e)
 
-    @pytest.mark.parametrize('deep', [
-        pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='deep'),
-        pytest.param(False, id='!deep')
-        ])
+    @pytest.mark.parametrize(
+        'deep',
+        [
+            pytest.param(True, marks=pytest.mark.xfail(raises=DataObjectError), id='deep'),
+            pytest.param(False, id='!deep'),
+        ],
+    )
     def test_deep_restriction(self, deep):
-        restric = {
-            'id': [0, 1, 2],
-            'x': R.INT.with_default(1),
-            'y': []
-            }
+        restric = {'id': [0, 1, 2], 'x': R.INT.with_default(1), 'y': []}
         if deep:
-            restric['deep'] = {
-                'this': [],
-                'fails': R(1, 2, 3, default=1)
-                }
+            restric['deep'] = {'this': [], 'fails': R(1, 2, 3, default=1)}
 
         class B(DataObject):
             _restrictions = restric
@@ -75,60 +69,44 @@ class TestDataObject:
     @pytest.mark.xfail(raises=DataObjectError)
     def test_malformed_restrictions(self):
         class FailsMalformed(DataObject):
-            _restrictions = {
-                'malformed': None
-                }
+            _restrictions = {'malformed': None}
 
     @pytest.mark.xfail(raises=RestrictionError)
     def test_mixed_restrictions(self):
         class FailsMixed(DataObject):
-            _restrictions = {
-                'mixed': R(int, 1, 2)
-                }
+            _restrictions = {'mixed': R(int, 1, 2)}
 
-    @pytest.mark.parametrize('restriction', [
-        [bool],
-        ([bool], None)
-        ])
+    @pytest.mark.parametrize('restriction', [[bool], ([bool], None)])
     @pytest.mark.xfail(raises=DataObjectError)
     def test_legacy_restrictions(self, restriction):
         class FailsLegacy(DataObject):
-            _restrictions = {
-                'legacy': restriction
-                }
+            _restrictions = {'legacy': restriction}
 
     @pytest.mark.xfail(raises=RestrictionError)
     def test_int_default(self):
         class FailsIntDefault(DataObject):
-            _restrictions = {
-                'int_default': R(default=int)
-                }
+            _restrictions = {'int_default': R(default=int)}
 
-    @pytest.mark.parametrize('d, strict, key', [
-        pytest.param(True, True, 'extra', marks=pytest.mark.xfail(raises=DataObjectError), id='d-strict-extra'),
-        pytest.param(True, True, 'missing', marks=pytest.mark.xfail(raises=DataObjectError), id='d-strict-missing'),
-        pytest.param(True, True, None, id='d-strict-None'),
-        pytest.param(True, False, 'extra', marks=pytest.mark.xfail(raises=DataObjectError), id='d-!strict-extra'),
-        pytest.param(True, False, 'missing', id='d-!strict-missing'),
-        pytest.param(True, False, None, id='d-!strict-None'),
-        pytest.param(False, True, None, marks=pytest.mark.xfail(raises=DataObjectError), id='!d-strict-None'),
-        pytest.param(False, False, None, id='!d-!strict-None')
-        ])
+    @pytest.mark.parametrize(
+        'd, strict, key',
+        [
+            pytest.param(True, True, 'extra', marks=pytest.mark.xfail(raises=DataObjectError), id='d-strict-extra'),
+            pytest.param(True, True, 'missing', marks=pytest.mark.xfail(raises=DataObjectError), id='d-strict-missing'),
+            pytest.param(True, True, None, id='d-strict-None'),
+            pytest.param(True, False, 'extra', marks=pytest.mark.xfail(raises=DataObjectError), id='d-!strict-extra'),
+            pytest.param(True, False, 'missing', id='d-!strict-missing'),
+            pytest.param(True, False, None, id='d-!strict-None'),
+            pytest.param(False, True, None, marks=pytest.mark.xfail(raises=DataObjectError), id='!d-strict-None'),
+            pytest.param(False, False, None, id='!d-!strict-None'),
+        ],
+    )
     def test_restrictions_runtime(self, d, strict, key):
-        restric = {
-            'id': R(0, 1, 2),
-            'x': R.INT.with_default(1),
-            'y': R()
-            }
+        restric = {'id': R(0, 1, 2), 'x': R.INT.with_default(1), 'y': R()}
 
         class B(DataObject):
             _restrictions = restric
 
-        data_ = {
-            'id': 0,
-            'x': 2,
-            'y': 'hi'
-            }
+        data_ = {'id': 0, 'x': 2, 'y': 'hi'}
         if key == 'extra':
             data_['z'] = None
         elif key == 'missing':
@@ -143,25 +121,12 @@ class TestDataObject:
             _restrictions = {
                 'x': R(1, 2),
                 'y': R.INT.with_default(100),
-                }
+            }
 
         class C(DataObject):
-            _restrictions = {
-                'a': A,
-                'b': B
-                }
+            _restrictions = {'a': A, 'b': B}
 
-        data_ = {
-            'a': {
-                'id': 1,
-                'name': 'evil-jenkins',
-                'status': 0
-                },
-            'b': {
-                'x': 1,
-                'y': 23
-                }
-            }
+        data_ = {'a': {'id': 1, 'name': 'evil-jenkins', 'status': 0}, 'b': {'x': 1, 'y': 23}}
         c = C(data=data_)
         assert c
         assert c.get('a') == c['a'] == c.a
@@ -195,50 +160,37 @@ class TestDataObject:
         for k, v in c_default.a.items():
             assert v is None, [(k, v) for k, v in c_default.a.items()]
 
-    @pytest.mark.parametrize('restrictions', [
-        pytest.param(R(A, type(None)), id='([A, type(None)], None)'),
-        A])
+    @pytest.mark.parametrize('restrictions', [pytest.param(R(A, type(None)), id='([A, type(None)], None)'), A])
     def test_supported_nested_restrictions_format(self, restrictions):
         class B(DataObject):
-            _restrictions = {
-                'a': restrictions
-                }
+            _restrictions = {'a': restrictions}
 
         class C(DataObject):
-            _restrictions = {
-                'b': B
-                }
+            _restrictions = {'b': B}
 
-        c = C(data={
-            'b': {
-                'a': A(data={
-                    'id': 1,
-                    'name': 'evil-jenkins',
-                    'status': 0
-                    })
-                }
-            })
+        c = C(data={'b': {'a': A(data={'id': 1, 'name': 'evil-jenkins', 'status': 0})}})
         assert c
         assert c.b
         assert c.b.a
         assert type(c.b.a) is A
 
-    @pytest.mark.parametrize('restrictions', [pytest.param((A, None),
-                                                           marks=pytest.mark.xfail(
-                                                               reason="'None' data not allowed for DO"),
-                                                           id='(A, None)'),
-                                              pytest.param(A, marks=pytest.mark.xfail)])
+    @pytest.mark.parametrize(
+        'restrictions',
+        [
+            pytest.param((A, None), marks=pytest.mark.xfail(reason="'None' data not allowed for DO"), id='(A, None)'),
+            pytest.param(A, marks=pytest.mark.xfail),
+        ],
+    )
     def test_null_nested_object(self, restrictions):
         class B(DataObject):
-            _restrictions = {
-                'a': restrictions
-                }
+            _restrictions = {'a': restrictions}
 
         b = B(data={'a': None})
         assert b
 
     def test_missing_restrictions(self):
         try:
+
             class B(DataObject):
                 pass
 
@@ -251,13 +203,9 @@ class TestDataObject:
 
     def test_nesting_dict_restrictions(self):
         try:
+
             class B(DataObject):
-                _restrictions = {
-                    'a': {
-                        'x': [],
-                        'y': []
-                        }
-                    }
+                _restrictions = {'a': {'x': [], 'y': []}}
 
             B(data={'a': {'x': 1, 'y': 2}})
             raise MyTestException('Error should have thrown.')
@@ -362,11 +310,7 @@ class TestDataObject:
         from datetime import date, datetime
 
         class B(DataObject):
-            _restrictions = {
-                'datetime': R.DATETIME,
-                'date': R.DATE,
-                'default': R()
-                }
+            _restrictions = {'datetime': R.DATETIME, 'date': R.DATE, 'default': R()}
 
         class MyObj(dict):
             pass
@@ -377,33 +321,26 @@ class TestDataObject:
         # __str__ returns string
         assert '%s' % a
 
-    @pytest.mark.parametrize('d, strict', [
-        ('valid', True),
-        pytest.param('invalid', True, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
-        pytest.param(None, True, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
-        pytest.param('partial', True, marks=pytest.mark.xfail(reason='Partial data not allowed when strict.')),
-        ('valid', False),
-        pytest.param('invalid', False, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
-        (None, False),
-        ('partial', False)
-        ])
+    @pytest.mark.parametrize(
+        'd, strict',
+        [
+            ('valid', True),
+            pytest.param('invalid', True, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
+            pytest.param(None, True, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
+            pytest.param('partial', True, marks=pytest.mark.xfail(reason='Partial data not allowed when strict.')),
+            ('valid', False),
+            pytest.param('invalid', False, marks=pytest.mark.xfail(reason='Data does not meet restrictions')),
+            (None, False),
+            ('partial', False),
+        ],
+    )
     def test_strict(self, d, strict):
         if d == 'valid':
-            d = {
-                'id': short_data[0][0],
-                'name': short_data[0][1],
-                'status': short_data[0][2]
-                }
+            d = {'id': short_data[0][0], 'name': short_data[0][1], 'status': short_data[0][2]}
         elif d == 'invalid':
-            d = {
-                'id': None,
-                'name': None,
-                'status': None
-                }
+            d = {'id': None, 'name': None, 'status': None}
         elif d == 'partial':
-            d = {
-                'id': 1
-                }
+            d = {'id': 1}
 
         a = A(data=d, strict=strict)
         assert a, '__init__ failed!'
@@ -433,13 +370,7 @@ class TestDataObject:
             _restrictions = {'id': R.INT}
 
         try:
-            type('Mixed',
-                 (DataObject,),
-                 {
-                     '_restrictions': {'id': [First, Second]},
-                     '__module__': 'pytest'
-                     }
-                 )
+            type('Mixed', (DataObject,), {'_restrictions': {'id': [First, Second]}, '__module__': 'pytest'})
             raise MyTestException('Mixed Data Objects should not be allowed in restrictions')
         except DataObjectError:
             assert True

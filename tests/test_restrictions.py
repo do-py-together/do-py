@@ -33,15 +33,11 @@ class MgdRest(ManagedRestrictions):
 
 
 class SampleA(DataObject):
-    _restrictions = {
-        'x': R.INT
-        }
+    _restrictions = {'x': R.INT}
 
 
 class SampleB(DataObject):
-    _restrictions = {
-        'x': [1, 2, 3]
-        }
+    _restrictions = {'x': [1, 2, 3]}
 
 
 class SampleC(DataObject):
@@ -53,29 +49,29 @@ class SampleC(DataObject):
         'x': R(SampleB, type(None)),
         'y': SampleA,
         'z': MgdRest(),
-        }
+    }
 
 
 class TestRestriction:
-
     def test_es_restrictions_override(self):
         r = {'type': 'text'}
 
         class SampleD(SampleA):
-            es_restrictions = {
-                'x': r
-                }
+            es_restrictions = {'x': r}
 
         class SampleE(DataObject):
-            _restrictions = {
-                'd': SampleD
-                }
+            _restrictions = {'d': SampleD}
 
         assert SampleE._restrictions['d'].es_restrictions == {'x': r}
 
-    @pytest.mark.parametrize('restriction', [
-        pytest.param([int, float], marks=pytest.mark.xfail(reason='Ambiguous for ES restrictions',
-                                                           raises=RestrictionError))])
+    @pytest.mark.parametrize(
+        'restriction',
+        [
+            pytest.param(
+                [int, float], marks=pytest.mark.xfail(reason='Ambiguous for ES restrictions', raises=RestrictionError)
+            )
+        ],
+    )
     def test_ambiguous_es_restriction(self, restriction):
         x = _ListTypeRestriction(restriction)
         assert x.es_restrictions, 'Failed'
@@ -89,18 +85,22 @@ class TestRestriction:
         except NotImplementedError:
             assert True
 
-    @pytest.mark.parametrize('allowed, default', [(int, 1),
-                                                  (float, 1.1),
-                                                  (bool, True),
-                                                  (date, date.today()),
-                                                  (datetime, datetime.now()),
-                                                  (dict, {'x': 1}),
-                                                  (dict, SampleA(data={'x': 1})),
-                                                  (list, [1, 2]),
-                                                  (set, {1, 2}),
-                                                  (str, 'A'),
-                                                  (tuple, (1, 2))
-                                                  ])
+    @pytest.mark.parametrize(
+        'allowed, default',
+        [
+            (int, 1),
+            (float, 1.1),
+            (bool, True),
+            (date, date.today()),
+            (datetime, datetime.now()),
+            (dict, {'x': 1}),
+            (dict, SampleA(data={'x': 1})),
+            (list, [1, 2]),
+            (set, {1, 2}),
+            (str, 'A'),
+            (tuple, (1, 2)),
+        ],
+    )
     def test_init_and_caching(self, allowed, default):
         instance_1 = R(allowed, default=default)
         assert instance_1
@@ -120,77 +120,97 @@ class TestRestriction:
         assert type(SampleC._restrictions['z']) is _MgdRestRestriction
         assert SampleC._restrictions['z'].es_restrictions is None
 
-    @pytest.mark.parametrize('data', [
-        None,
-        'a',
-        'b',
-        pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'data', [None, 'a', 'b', pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))]
+    )
     def test_null_str_values(self, data):
         SampleC._restrictions['t'](data)
 
-    @pytest.mark.parametrize('data', [
-        'a',
-        'b',
-        pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
-        pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'data',
+        [
+            'a',
+            'b',
+            pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
+            pytest.param(None, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError)),
+        ],
+    )
     def test_str_values(self, data):
         SampleC._restrictions['u'](data)
 
-    @pytest.mark.parametrize('data', [
-        1, 2, 3, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'data', [1, 2, 3, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))]
+    )
     def test_list_values(self, data):
         assert SampleC._restrictions['v'](data)
 
-    @pytest.mark.parametrize('data', [
-        2.0, None, pytest.param('x', marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'data', [2.0, None, pytest.param('x', marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))]
+    )
     def test_list_types(self, data):
         assert SampleC._restrictions['w'](data) == data
 
-    @pytest.mark.parametrize('data', [
-        1, 2, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=DataObjectError))
-        ])
+    @pytest.mark.parametrize(
+        'data', [1, 2, pytest.param(4, marks=pytest.mark.xfail(reason='Bad data', raises=DataObjectError))]
+    )
     def test_do1(self, data):
         assert SampleC._restrictions['x'](SampleB(data={'x': data}))
 
-    @pytest.mark.parametrize('data', [
-        1, 2, pytest.param('x', marks=pytest.mark.xfail(reason='Bad data', raises=DataObjectError))
-        ])
+    @pytest.mark.parametrize(
+        'data', [1, 2, pytest.param('x', marks=pytest.mark.xfail(reason='Bad data', raises=DataObjectError))]
+    )
     def test_do2(self, data):
         assert SampleC._restrictions['y'](SampleA(data={'x': data}))
 
-    @pytest.mark.parametrize('data', [
-        'good', pytest.param('bad', marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))
-        ])
+    @pytest.mark.parametrize(
+        'data', ['good', pytest.param('bad', marks=pytest.mark.xfail(reason='Bad data', raises=RestrictionError))]
+    )
     def test_mr(self, data):
         assert SampleC._restrictions['z'](data)
 
-    @pytest.mark.parametrize('allowed, default', [
-        pytest.param([SampleA, SampleB], None, marks=pytest.mark.xfail(reason='Two DOs', raises=RestrictionError)),
-        pytest.param([int, 1], None, marks=pytest.mark.xfail(reason='Mixed types', raises=RestrictionError)),
-        pytest.param([SampleA, int, float], None, marks=pytest.mark.xfail(reason='DOs mixed with other types',
-                                                                          raises=RestrictionError)),
-        pytest.param({SampleA, int, float}, None,
-                     marks=pytest.mark.xfail(reason='Syntax error', raises=RestrictionError)),
-        pytest.param([SampleA], int, marks=pytest.mark.xfail(reason='Default value error', raises=RestrictionError)),
-        ])
+    @pytest.mark.parametrize(
+        'allowed, default',
+        [
+            pytest.param([SampleA, SampleB], None, marks=pytest.mark.xfail(reason='Two DOs', raises=RestrictionError)),
+            pytest.param([int, 1], None, marks=pytest.mark.xfail(reason='Mixed types', raises=RestrictionError)),
+            pytest.param(
+                [SampleA, int, float],
+                None,
+                marks=pytest.mark.xfail(reason='DOs mixed with other types', raises=RestrictionError),
+            ),
+            pytest.param(
+                {SampleA, int, float}, None, marks=pytest.mark.xfail(reason='Syntax error', raises=RestrictionError)
+            ),
+            pytest.param(
+                [SampleA], int, marks=pytest.mark.xfail(reason='Default value error', raises=RestrictionError)
+            ),
+        ],
+    )
     def test_restriction_error(self, allowed, default):
         assert R(*allowed, default=default)
 
-    @pytest.mark.parametrize('instance', [
-        pytest.param(SampleC._restrictions['v'],  # ListValue
-                     marks=pytest.mark.xfail(reason='Singleton reuses memory locations')),
-        pytest.param(SampleC._restrictions['w'],  # ListType
-                     marks=pytest.mark.xfail(reason='Singleton reuses memory locations')),
-        pytest.param(SampleC._restrictions['x'],  # NullableDO
-                     marks=pytest.mark.xfail(reason='Singleton reuses memory locations')),
-        pytest.param(SampleC._restrictions['y'],  # DO
-                     marks=pytest.mark.xfail(reason='Singleton reuses memory locations')),
-        SampleC._restrictions['z'],  # MgdRestr is not Singleton
-        ])
+    @pytest.mark.parametrize(
+        'instance',
+        [
+            pytest.param(
+                SampleC._restrictions['v'],  # ListValue
+                marks=pytest.mark.xfail(reason='Singleton reuses memory locations'),
+            ),
+            pytest.param(
+                SampleC._restrictions['w'],  # ListType
+                marks=pytest.mark.xfail(reason='Singleton reuses memory locations'),
+            ),
+            pytest.param(
+                SampleC._restrictions['x'],  # NullableDO
+                marks=pytest.mark.xfail(reason='Singleton reuses memory locations'),
+            ),
+            pytest.param(
+                SampleC._restrictions['y'],  # DO
+                marks=pytest.mark.xfail(reason='Singleton reuses memory locations'),
+            ),
+            SampleC._restrictions['z'],  # MgdRestr is not Singleton
+        ],
+    )
     def test_deep_copy(self, instance):
         instance_copy = deepcopy(instance)
         assert instance == instance_copy
@@ -199,11 +219,7 @@ class TestRestriction:
 
     def test_singleton(self):
         class Singletons(DataObject):
-            _restrictions = {
-                'v': R(1, 2, 3),
-                'x': R(SampleB, type(None)),
-                'y': SampleA
-                }
+            _restrictions = {'v': R(1, 2, 3), 'x': R(SampleB, type(None)), 'y': SampleA}
 
         for k in Singletons._restrictions:
             assert id(Singletons._restrictions[k]) == id(SampleC._restrictions[k])

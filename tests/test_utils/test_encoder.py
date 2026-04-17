@@ -5,7 +5,6 @@ from do_py.utils.json_encoder import MyJSONEncoder
 
 
 class TestMyJSONEncoder:
-
     def test(self):
         today_datetime = datetime.today()
         today_date = today_datetime.date()

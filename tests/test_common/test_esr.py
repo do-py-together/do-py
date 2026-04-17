@@ -2,7 +2,6 @@
 :date_created: 2020-06-28
 """
 
-
 import pytest
 
 from do_py import DataObject
@@ -30,17 +29,11 @@ class TestESR:
         """
 
         class SampleDO(DataObject):
-            _restrictions = {
-                'x': R.INT
-                }
-            es_restrictions = {
-                'x': ESR.INT
-                }
+            _restrictions = {'x': R.INT}
+            es_restrictions = {'x': ESR.INT}
 
         class BadSampleDO(DataObject):
-            _restrictions = {
-                'x': R.INT
-                }
+            _restrictions = {'x': R.INT}
 
         return SampleDO({'x': 1}) if request.param else BadSampleDO
 
@@ -60,8 +53,9 @@ class TestESR:
 
 
 class TestESEncoder:
-
-    @pytest.mark.parametrize('datatype, mapping',
-                             list(ESEncoder.encoding.items()) + [pytest.param(ESEncoder, None, marks=pytest.mark.xfail())])
+    @pytest.mark.parametrize(
+        'datatype, mapping',
+        list(ESEncoder.encoding.items()) + [pytest.param(ESEncoder, None, marks=pytest.mark.xfail())],
+    )
     def test_encoding(self, datatype, mapping):
         assert ESEncoder.default(datatype) == mapping

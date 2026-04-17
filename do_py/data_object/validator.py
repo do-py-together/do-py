@@ -32,6 +32,7 @@ class Validator(DataObject):
 
     :attribute _validate: a validation function to validate data for mutually dependent keys
     """
+
     _is_abstract_ = True
 
     def __init__(self, data=None, strict=True):

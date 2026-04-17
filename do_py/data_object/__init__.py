@@ -37,6 +37,7 @@ class DataObject(RestrictedDictMixin):
 
     :attribute _restrictions: dictionary defining data structure and valid values.
     """
+
     _schema = None
 
     @classmethod
@@ -51,7 +52,7 @@ class DataObject(RestrictedDictMixin):
             try:
                 cls._restrictions[k] = Restriction.legacy(cls._restrictions[k])
             except RestrictionError as e:
-                raise DataObjectError.from_restriction_error(k, cls, e)
+                raise DataObjectError.from_restriction_error(k, cls, e) from e
 
     @classmethod
     def _validate_data(cls, _restrictions, d, strict=True):
@@ -98,7 +99,7 @@ class DataObject(RestrictedDictMixin):
                 try:
                     _dict[k] = v(d[k], strict=strict)
                 except RestrictionError as e:
-                    raise DataObjectError.from_restriction_error(k, cls, e)
+                    raise DataObjectError.from_restriction_error(k, cls, e) from e
 
         return _dict
 
@@ -140,7 +141,7 @@ class DataObject(RestrictedDictMixin):
         return dict(self)
 
     # TODO: Needs a test
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
         """
         Supports deep copying of DataObject. This gives user back plain old python dictionary.
         :param memodict:
@@ -148,6 +149,8 @@ class DataObject(RestrictedDictMixin):
         :return: python dictionary representation
         :rtype: dict
         """
+        if memodict is None:
+            memodict = {}
         # NOTE: this could be an alternative implementation
         # return self.__class__(data=dict(self))
         memodict[id(self)] = self.__copy__()

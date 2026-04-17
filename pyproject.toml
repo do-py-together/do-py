@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
 ]
 
 [project.urls]
@@ -61,6 +62,10 @@ addopts = "-so xfail_strict=True --durations 10 --maxfail 10"
 line-length = 120
 target-version = "py310"
 
+[tool.ruff.format]
+# Preserve the codebase's existing single-quote style.
+quote-style = "single"
+
 [tool.ruff.lint]
 # Sensible default lint set without being too aggressive on a legacy
 # codebase. Phase 6 will broaden this and add type annotations.
@@ -75,13 +80,9 @@ select = [
 ignore = [
     "E501",   # line-too-long — line-length is advisory; long docstrings/URLs happen
     "E721",   # use isinstance() — DataObject intentionally uses `type(x) is T` for strict (non-subtype) checks
-    "E731",   # lambda assignment — a couple of intentional usages; Phase 6 will revisit
-    "B006",   # mutable default args — 2 real but non-urgent cases (deepcopy memodict); Phase 6
     "B008",   # function call in argument default — false positive heavy for dataclass-like APIs
-    "B904",   # use `raise X from Y` — broader exception handling cleanup in Phase 6
-    "B905",   # zip without strict=  — needs domain review; Phase 6
-    "UP031",  # printf-style formatting — pervasive in error-message templates; converting changes deferred-
-              # formatting semantics. Phase 6.
+    "UP031",  # printf-style formatting — pervasive in error-message templates; converting would change
+              # deferred-formatting semantics (templates are used as `MSG % args` at call sites).
     "UP008",  # super() without args — NOT safe on this codebase. The @ABCRestrictions.require decorator
               # rebuilds decorated classes via `meta(name, bases, namespace)`, which copies methods from
               # the original class's dict. Methods' implicit __class__ cell still references the ORIGINAL
@@ -90,12 +91,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# Re-exports from package __init__.py look like unused imports to ruff.
-# Long-term we can add explicit __all__ or `X as X` syntax; for now,
-# ignore F401 in these specific files.
-"do_py/__init__.py" = ["F401"]
-"do_py/exceptions/__init__.py" = ["F401"]
-"do_py/utils/__init__.py" = ["F401"]
 "tests/**" = [
     "B011",  # `assert False` is idiomatic in some test patterns here
 ]
