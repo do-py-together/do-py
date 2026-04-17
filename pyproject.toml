@@ -1,3 +1,75 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "do-py"
+version = "0.4.1"
+description = "Data validation and standardization library wrapping Python dictionaries."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Tim Davis", email = "timdavis.3991@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["development", "OO"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/do-py-together/do-py"
+Repository = "https://github.com/do-py-together/do-py"
+Issues = "https://github.com/do-py-together/do-py/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "pytest-forked>=1.6",
+    "pytest-timeout>=2",
+    "pytest-xdist>=3",
+    "coverage>=7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["do_py"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/do_py",
+    "/README.md",
+    "/LICENSE",
+    "/CONTRIBUTING.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-so xfail_strict=True --durations 10 --maxfail 10"
+
+[tool.coverage.run]
+source = ["do_py"]
+omit = [
+    "tests/*",
+    "tests/**",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self\\.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]
