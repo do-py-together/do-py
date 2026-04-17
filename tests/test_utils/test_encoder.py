@@ -1,5 +1,4 @@
 import json
-from builtins import object
 
 from datetime import datetime
 

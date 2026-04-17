@@ -2,17 +2,10 @@
 Commonly used restrictions.
 :date_created: 2020-06-28
 """
-import sys
-
 from datetime import date, datetime
-from future.types import newint, newlist, newstr
-from past.builtins import long, unicode
 
 from do_py.data_object import Restriction
 from do_py.utils import classproperty
-
-
-IS_PY3 = sys.version_info.major == 3
 
 
 class R(object):
@@ -70,10 +63,7 @@ class R(object):
         Shortcut for an int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint)
-        else:
-            return cls(int, newint)
+        return cls(int)
 
     @classproperty
     def FLOAT(cls):
@@ -89,10 +79,7 @@ class R(object):
         Shortcut for string restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(str, newstr.newstr)
-        else:
-            return cls(str, unicode, newstr)
+        return cls(str)
 
     @classproperty
     def NULL_INT(cls):
@@ -100,10 +87,7 @@ class R(object):
         Shortcut for a nullable int restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, type(None))
-        else:
-            return cls(int, newint, type(None))
+        return cls(int, type(None))
 
     @classproperty
     def NULL_FLOAT(cls):
@@ -119,10 +103,7 @@ class R(object):
         Shortcut for a nullable string restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(str, newstr.newstr, type(None))
-        else:
-            return cls(str, unicode, newstr, type(None))
+        return cls(str, type(None))
 
     @classproperty
     def LIST(cls):
@@ -130,10 +111,7 @@ class R(object):
         Shortcut for a list restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(list, newlist.newlist)
-        else:
-            return cls(list, newlist)
+        return cls(list)
 
     @classproperty
     def SET(cls):
@@ -149,10 +127,7 @@ class R(object):
         Shortcut for a nullable list restriction.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(list, newlist.newlist, type(None))
-        else:
-            return cls(list, newlist, type(None))
+        return cls(list, type(None))
 
     @classproperty
     def BOOL(cls):
@@ -207,20 +182,22 @@ class R(object):
     def LONG_INT(cls):
         """
         Shortcut for a long int restriction.
+
+        NOTE: In Python 3, `long` has been unified with `int`, so this is
+        functionally identical to ``R.INT``. Kept for backward-compatible
+        restriction declarations.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, long)
-        else:
-            return cls(int, newint, long)
+        return cls(int)
 
     @classproperty
     def NULL_LONG_INT(cls):
         """
         Shortcut for a nullable long int restriction.
+
+        NOTE: In Python 3, `long` has been unified with `int`, so this is
+        functionally identical to ``R.NULL_INT``. Kept for backward-compatible
+        restriction declarations.
         :rtype: Restriction
         """
-        if IS_PY3:
-            return cls(int, newint.newint, long, type(None))
-        else:
-            return cls(int, newint, long, type(None))
+        return cls(int, type(None))

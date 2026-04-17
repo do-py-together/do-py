@@ -5,8 +5,6 @@ Property decorators useful for organizing code in a DO.
 
 import inspect
 
-from builtins import object
-
 
 class classproperty(object):
     """

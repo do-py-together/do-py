@@ -3,9 +3,6 @@ Constants to support base_model modules.
 :date_created: 2018-12-05
 """
 
-from builtins import object
-
-
 class ConstABCR(object):
     """
     Constants supporting ABCRestrictions

@@ -2,7 +2,6 @@
 :date_created: 2020-06-28
 """
 
-from builtins import object
 
 import pytest
 

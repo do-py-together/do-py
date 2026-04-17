@@ -4,7 +4,6 @@
 from datetime import date, datetime
 
 import pytest
-from builtins import object
 
 from do_py import R
 from do_py.common.managed_datetime import MgdDatetime

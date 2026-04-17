@@ -4,9 +4,6 @@ System messages to directly support error messages in base_model modules.
 :author: Tim Davis
 """
 
-from builtins import object
-
-
 class SystemMessages(object):
     REQUIRED_FOR = '%s is required for %s!'
     GENERIC = 'Unknown error.'

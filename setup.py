@@ -33,9 +33,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/do-py-together/do-py',
-    install_requires=[
-        'future>=0.18'
-        ],
+    install_requires=[],
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     # https://pypi.org/classifiers/
     classifiers=[
@@ -48,10 +46,7 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
 
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9',
         ],
     keywords=['development', 'OO']
