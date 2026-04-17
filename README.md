@@ -160,17 +160,21 @@ from do_py import DataObject, R
 
 
 class Contact(DataObject):
+    """
+    Contact information for an author.
+    :restriction phone_number: A phone number as a string.
+    """
     _restrictions = {
-        'phone_number'
+        'phone_number': R.STR
         }
 
 
 class Author(DataObject):
     """
-    A DataObject that contains all of my favorite items.
-    :restriction id:
-    :restriction favorite_candy: My favorite candy, this is restricted by value.
-    :restriction favorite_movie: My favorite movie. This is optional because a `None` IS allowed!
+    An author of a video game.
+    :restriction id: The author's id.
+    :restriction name: The author's name.
+    :restriction contact: Nested Contact DataObject.
     """
     _restrictions = {
         'id': R.INT,
@@ -181,10 +185,10 @@ class Author(DataObject):
 
 class VideoGame(DataObject):
     """
-    A DataObject that contains all of my favorite items.
-    :restriction id:
-    :restriction favorite_candy: My favorite candy, this is restricted by value.
-    :restriction favorite_movie: My favorite movie. This is optional because a `None` IS allowed!
+    A video game, authored by someone.
+    :restriction id: The video game's id.
+    :restriction name: The video game's name (optional).
+    :restriction author: Nested Author DataObject.
     """
     _restrictions = {
         'id': R.INT,
@@ -193,12 +197,18 @@ class VideoGame(DataObject):
         }
 
 
-# Data objects must be instantiated at their **init** with a dictionary and
-#   strict(True(default) or False)
+# DataObjects must be instantiated with a dictionary and strict=True (default) or False.
+# Nested DataObjects are built recursively from nested dicts.
 instance = VideoGame({
-    'favorite_number': 1985,
-    'favorite_candy': 'Jolly Ranchers',
-    'favorite_movie': 'Jolly Green Giant'
+    'id': 1985,
+    'name': 'Super Mario Bros.',
+    'author': {
+        'id': 1,
+        'name': 'Shigeru Miyamoto',
+        'contact': {
+            'phone_number': '555-0100'
+            }
+        }
     })
 
 print(instance)
