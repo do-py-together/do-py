@@ -121,9 +121,8 @@ class TestOrderedManagedList:
         priorities = [item.priority for item in container.entries]
         assert priorities == [3, 2, 1], 'Expected reverse sorted order, got %s' % priorities
 
-    @pytest.mark.xfail(raises=TypeError, reason='Bug: OrderedManagedList.manage() calls sorted(None)')
     def test_nullable_ordered_list(self):
-        """Nullable OrderedManagedList should accept None but currently doesn't due to a bug."""
+        """Nullable OrderedManagedList should accept None."""
 
         class NullableContainer(DataObject):
             _restrictions = {'entries': OrderedManagedList(SortableItem, nullable=True, key=lambda x: x.priority)}
@@ -155,3 +154,15 @@ class TestOrderedManagedList:
 
         container = SortedContainer({'entries': []})
         assert container.entries == []
+
+    def test_non_list_string_input_raises(self):
+        """String input should be rejected (hits .keys() on non-dict during DO init)."""
+        ml = ManagedList(SortableItem)
+        with pytest.raises(AttributeError):
+            ml('not a list')
+
+    def test_non_list_int_input_raises(self):
+        """Int input should be rejected (not iterable)."""
+        ml = ManagedList(SortableItem)
+        with pytest.raises(TypeError):
+            ml(42)

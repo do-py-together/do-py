@@ -7,7 +7,7 @@ import pytest
 
 from do_py import DataObject, R
 from do_py.data_object.dynamic_restrictions import DynamicRestrictions, dynamic_restriction_mixin
-from do_py.exceptions import DataObjectError, RestrictionError
+from do_py.exceptions import DataObjectError
 
 
 class MilkMetadata(DataObject):
@@ -91,9 +91,9 @@ class TestDynamicSetItem:
         assert breakfast.item_metadata.flavor == 'normal'
 
     def test_setitem_dependent_key_mismatched_restriction(self):
-        """Setting the dependent key with mismatched data should fail."""
+        """Setting the dependent key with mismatched data should fail with DataObjectError."""
         breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
-        with pytest.raises((DataObjectError, RestrictionError, AssertionError)):
+        with pytest.raises(DataObjectError):
             breakfast['item_metadata'] = CerealMetadata({'brand': 'cheerios'})
 
     def test_setitem_non_dynamic_key(self):
@@ -102,13 +102,25 @@ class TestDynamicSetItem:
         breakfast['name'] = 'morning milk'
         assert breakfast.name == 'morning milk'
 
-    def test_setitem_independent_key_same_type(self):
-        """Changing the independent key while dependent value is still compatible."""
-        # Create two breakfasts to verify setitem on dependent works per-type
+    def test_setitem_dependent_key_update(self):
+        """Setting the dependent key with a new valid value of the same type should succeed."""
         milk = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
         milk.item_metadata = MilkMetadata({'flavor': 'normal'})
         assert milk._restrictions['item_metadata'] == MilkMetadata
         assert milk.item_metadata.flavor == 'normal'
+
+    def test_setitem_independent_key_revalidates_dependent(self):
+        """Changing the independent key triggers revalidation of the dependent value.
+
+        Since the existing dependent value (MilkMetadata) doesn't match the new restriction
+        (CerealMetadata), this correctly raises an error. The independent and dependent keys
+        are coupled — you cannot change one without the other being compatible.
+        """
+        breakfast = Breakfast({'item': 'milk', 'item_metadata': {'flavor': 'chocolate'}})
+        assert breakfast._restrictions['item_metadata'] == MilkMetadata
+        # Changing independent key revalidates the existing dependent value against the new restriction
+        with pytest.raises(DataObjectError):
+            breakfast['item'] = 'cereal'
 
 
 class TestDynamicInstanceIsolation:

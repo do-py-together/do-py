@@ -6,6 +6,7 @@ import pytest
 
 from do_py.common import R
 from do_py.data_object.restriction import AbstractRestriction
+from do_py.exceptions import RestrictionError
 
 
 class TestR:
@@ -47,8 +48,6 @@ class TestRShortcuts:
         result = restriction(valid_value)
         assert result == valid_value
         # Invalid value should raise
-        from do_py.exceptions import RestrictionError
-
         with pytest.raises(RestrictionError):
             restriction(invalid_value)
 
@@ -77,16 +76,12 @@ class TestRShortcuts:
     )
     def test_non_nullable_rejects_none(self, shortcut):
         """Non-nullable shortcuts should reject None."""
-        from do_py.exceptions import RestrictionError
-
         restriction = getattr(R, shortcut)
         with pytest.raises(RestrictionError):
             restriction(None)
 
     def test_bool_int(self):
         """BOOL_INT should accept 0 and 1 only."""
-        from do_py.exceptions import RestrictionError
-
         r = R.BOOL_INT
         assert r(0) == 0
         assert r(1) == 1

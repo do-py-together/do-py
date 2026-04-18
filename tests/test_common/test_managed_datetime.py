@@ -278,3 +278,43 @@ class TestMgdDatetimeMicrosecondStripping:
         instance = MgdDatetime.datetime()
         result = instance(dt_with_micro)
         assert result.microsecond == 0
+
+
+class TestMgdDatetimeCrossTypeInputs:
+    """Test edge cases: passing wrong type (date to datetime(), datetime to date())."""
+
+    def test_date_instance_to_datetime_restriction_fails(self):
+        """Passing a date object to a datetime restriction should fail."""
+        instance = MgdDatetime.datetime()
+        with pytest.raises(RestrictionError):
+            instance(test_date_instance_now)
+
+    def test_datetime_instance_to_date_restriction_fails(self):
+        """Passing a datetime object to a date restriction should fail."""
+        instance = MgdDatetime.date()
+        with pytest.raises(RestrictionError):
+            instance(test_dt_instance_now)
+
+    def test_date_isoformat_to_datetime_restriction_fails(self):
+        """A date-format ISO string should fail when datetime is expected (too short)."""
+        instance = MgdDatetime.datetime()
+        with pytest.raises(RestrictionError):
+            instance(test_date_instance_now.isoformat())
+
+    def test_datetime_isoformat_to_date_restriction_fails(self):
+        """A datetime-format ISO string should fail when date is expected (too long)."""
+        instance = MgdDatetime.date()
+        with pytest.raises(RestrictionError):
+            instance(test_dt_instance_now.isoformat())
+
+    def test_from_from_date_with_datetime_string(self):
+        """from_from_date should reject a datetime-format ISO string."""
+        instance = MgdDatetime.from_from_date()
+        with pytest.raises(RestrictionError):
+            instance(test_dt_instance_now.isoformat())
+
+    def test_from_from_datetime_with_date_string(self):
+        """from_from_datetime should reject a date-format ISO string."""
+        instance = MgdDatetime.from_from_datetime()
+        with pytest.raises(RestrictionError):
+            instance(test_date_instance_now.isoformat())
