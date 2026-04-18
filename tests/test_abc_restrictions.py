@@ -10,20 +10,7 @@ from do_py.abc.messages import SystemMessages
 from do_py.abc.utils import already_declared, compare_cls
 
 
-@pytest.fixture()
-def _abc_cleanup():
-    """
-    Snapshot and restore ABCRestrictionMeta global state so that test-created
-    classes never leak into other tests.
-    """
-    original_classes = set(ABCRestrictionMeta._abc_classes)
-    original_uniques = {k: list(v) for k, v in ABCRestrictionMeta._unique_attrs.items()}
-    yield
-    ABCRestrictionMeta._abc_classes = original_classes
-    ABCRestrictionMeta._unique_attrs = {k: list(v) for k, v in original_uniques.items()}
-
-
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestABCRestrictions:
     """Core tests for the ABCRestrictions.require decorator and ABCRestrictionMeta."""
 
@@ -87,7 +74,7 @@ class TestABCRestrictions:
             parent_class()
 
 
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestABCRestrictionMetaBranches:
     """Test all three branches of ABCRestrictionMeta.__new__: root, node, leaf."""
 
@@ -160,7 +147,7 @@ class TestABCRestrictionMetaBranches:
         assert Leaf.x == 99
 
 
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestUniqueAttributes:
     """Test the system-wide uniqueness enforcement for unique attrs."""
 
@@ -204,7 +191,7 @@ class TestUniqueAttributes:
         assert Redeclared.uid == 'val'
 
 
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestCompileHook:
     """Test that __compile__ is invoked on leaf classes."""
 
@@ -224,7 +211,7 @@ class TestCompileHook:
         assert Leaf.x == 1
 
 
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestNestedNew:
     """Test that the nested __new__ wrapper handles all branches."""
 
@@ -271,7 +258,7 @@ class TestNestedNew:
         assert Leaf.x == 1
 
 
-@pytest.mark.usefixtures('_abc_cleanup')
+@pytest.mark.usefixtures('abc_cleanup')
 class TestRequireEdgeCases:
     """Edge cases for ABCRestrictions.require."""
 
