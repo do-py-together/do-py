@@ -155,11 +155,14 @@ class TestOrderedManagedList:
         container = SortedContainer({'entries': []})
         assert container.entries == []
 
-    def test_non_list_input_raises(self):
-        """Non-list input (e.g. string, int) should not be silently accepted."""
+    def test_non_list_string_input_raises(self):
+        """String input should be rejected (hits .keys() on non-dict during DO init)."""
         ml = ManagedList(SortableItem)
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError):
             ml('not a list')
 
-        with pytest.raises(Exception):
+    def test_non_list_int_input_raises(self):
+        """Int input should be rejected (not iterable)."""
+        ml = ManagedList(SortableItem)
+        with pytest.raises(TypeError):
             ml(42)
